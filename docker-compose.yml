@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+  redis:
+    image: redis
+  web:
+    image: discourse
+    build: .
+    environment:
+      - DISCOURSE_HOSTNAME=localhost
+      - DISCOURSE_DB_HOST=db
+      - DISCOURSE_DB_PORT=5432
+      - DISCOURSE_DB_NAME=postgres
+      - DISCOURSE_DB_USERNAME=postgres
+      - DISCOURSE_DB_PASSWORD=password
+      - DISCOURSE_REDIS_HOST=redis
+      - RAILS_ENV=production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
