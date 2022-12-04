@@ -38,5 +38,7 @@ RUN  --mount=type=cache,target=/root/.yarn \
 
 RUN bundle config set --local without 'test development'
 RUN bundle install --jobs 4
-
+WORKDIR /home/discourse/discourse
+RUN mkdir -p tmp/sockets log tmp/pids
+WORKDIR /var/www/discourse
 CMD ["bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]
