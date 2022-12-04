@@ -2,6 +2,8 @@
 # https://github.com/discourse/discourse/blob/main/docs/DEVELOPER-ADVANCED.md
 # https://hub.docker.com/_/ruby
 
+# Use Ruby < 3.1 to avoid missing net/pop error
+# https://github.com/discourse/discourse/pull/15692/files
 FROM ruby:3.0
 
 ENV LANG C.UTF-8
@@ -37,6 +39,4 @@ RUN  --mount=type=cache,target=/root/.yarn \
 RUN bundle config set --local without 'test development'
 RUN bundle install --jobs 4
 
-# COPY entrypoint.sh ./entrypoint.sh
 CMD ["bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]
-# ENTRYPOINT ["./entrypoint.sh"]
