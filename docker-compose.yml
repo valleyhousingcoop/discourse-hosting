@@ -3,13 +3,15 @@ services:
     image: postgres
     environment:
       POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
   redis:
     image: redis
   web:
     image: discourse
     build: .
     environment:
-      - DISCOURSE_HOSTNAME=localhost
+      - DISCOURSE_HOSTNAME=forum.valleyhousing.coop
       - DISCOURSE_DB_HOST=db
       - DISCOURSE_DB_PORT=5432
       - DISCOURSE_DB_NAME=postgres
@@ -17,6 +19,7 @@ services:
       - DISCOURSE_DB_PASSWORD=password
       - DISCOURSE_REDIS_HOST=redis
       - RAILS_ENV=production
+    command: bundle exec rails server -b 0.0.0.0 -p 3000
     ports:
       - "3000:3000"
     depends_on:

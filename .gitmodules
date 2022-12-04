@@ -1,3 +1,0 @@
-[submodule "discourse"]
-	path = discourse
-	url = https://github.com/discourse/discourse.git
