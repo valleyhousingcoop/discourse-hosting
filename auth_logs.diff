@@ -1,0 +1,13 @@
+diff --git a/config/routes.rb b/config/routes.rb
+index a432005590..ce208c6898 100644
+--- a/config/routes.rb
++++ b/config/routes.rb
+@@ -27,7 +27,7 @@ Discourse::Application.routes.draw do
+     post "webhooks/sparkpost" => "webhooks#sparkpost"
+
+     scope path: nil, constraints: { format: /.*/ } do
+-      if Rails.env.development?
++      if ActiveModel::Type::Boolean.new.cast(ENV['NO_AUTH_LOGS'] || true)
+         mount Sidekiq::Web => "/sidekiq"
+         mount Logster::Web => "/logs"
+       else

@@ -6,21 +6,18 @@ services:
     ports:
       - "5432:5432"
   redis:
-    image: redis
-  web:
-    image: discourse
-    build: .
+    image: redis/redis-stack:latest
+    ports:
+      - "8001:8001"
+      - "6379:6379"
     environment:
-      # Need to pretend its not localhost or else will error
-      - DISCOURSE_HOSTNAME=forum.valleyhousing.coop:3000
-      - DISCOURSE_DB_HOST=db
-      - DISCOURSE_DB_PORT=5432
-      - DISCOURSE_DB_NAME=postgres
-      - DISCOURSE_DB_USERNAME=postgres
-      - DISCOURSE_DB_PASSWORD=password
-      - DISCOURSE_REDIS_HOST=redis
-      - RAILS_ENV=production
-      - DISCOURSE_SERVE_STATIC_ASSETS=true
+        REDIS_ARGS: --requirepass password
+    volumes:
+      - ./redis-data:/data
+  web:
+    extends:
+      file: base.docker-compose.yml
+      service: discourse
     # command: bash -c "bundle exec rake assets:precompile && bundle exec rails server -b 0.0.0.0 -p 3000"
     command: bundle exec rails server -b 0.0.0.0 -p 3000
     ports:
@@ -30,4 +27,16 @@ services:
       - redis
     volumes:
       - ./assets:/var/www/discourse/public/assets/
-      - ./log:/var/www/discourse/log/
+      - ./web-log:/var/www/discourse/log/
+  sidekiq:
+    extends:
+      file: base.docker-compose.yml
+      service: discourse
+    # COpied from demon/sidekiq.rb
+    command: bundle exec sidekiq -q critical,8 -q default,4 -q low,2 -q ultra_low,1 --verbose
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./sidekiq-log:/var/www/discourse/log/
+      - ./uploads:/var/www/discourse/public/uploads/

@@ -1,2 +1,5 @@
 assets
 log
+.env
+redis-data
+*-log

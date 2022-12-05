@@ -41,5 +41,7 @@ RUN bundle install --jobs 4
 WORKDIR /home/discourse/discourse
 RUN mkdir -p tmp/sockets log tmp/pids
 WORKDIR /var/www/discourse
-ADD 999-custom.rb config/initializers/
+# ADD 999-custom.rb config/initializers/
+ADD auth_logs.diff /tmp/
+RUN git apply /tmp/auth_logs.diff
 CMD ["bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]

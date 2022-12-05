@@ -1,0 +1,25 @@
+services:
+  discourse:
+    image: discourse
+    build: .
+    environment:
+      # Need to pretend its not localhost or else will error
+      - DISCOURSE_HOSTNAME=${HOSTNAME}:3000
+      - DISCOURSE_DB_HOST=db
+      - DISCOURSE_DB_PORT=5432
+      - DISCOURSE_DB_NAME=postgres
+      - DISCOURSE_DB_USERNAME=postgres
+      - DISCOURSE_DB_PASSWORD=password
+      - DISCOURSE_REDIS_HOST=redis
+      - DISCOURSE_REDIS_PASSWORD=password
+      - RAILS_ENV=production
+      - DISCOURSE_SERVE_STATIC_ASSETS=true
+      - DISCOURSE_DEVELOPER_EMAILS=${EMAIL}
+      - DISCOURSE_SMTP_ADDRESS=smtp.sendgrid.net
+      - DISCOURSE_SMTP_DOMAIN=${EMAIL_DOMAIN}
+      - DISCOURSE_SMTP_USER_NAME=apikey
+      - DISCOURSE_SMTP_PASSWORD=${SEND_GRID_API_KEY}
+      - DISCOURSE_SMTP_PORT=587
+      - DISCOURSE_SMTP_ENABLE_START_TLS=true
+      - NO_AUTH_LOGS=true
+
