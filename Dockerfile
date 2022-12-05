@@ -41,4 +41,5 @@ RUN bundle install --jobs 4
 WORKDIR /home/discourse/discourse
 RUN mkdir -p tmp/sockets log tmp/pids
 WORKDIR /var/www/discourse
+ADD 999-custom.rb config/initializers/
 CMD ["bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]

@@ -22,6 +22,7 @@ services:
     image: discourse
     build: .
     environment:
+      # Need to pretend its not localhost or else will error
       - DISCOURSE_HOSTNAME=forum.valleyhousing.coop
       - DISCOURSE_DB_HOST=db
       - DISCOURSE_DB_PORT=5432
@@ -30,6 +31,8 @@ services:
       - DISCOURSE_DB_PASSWORD=password
       - DISCOURSE_REDIS_HOST=redis
       - RAILS_ENV=production
+      - DISCOURSE_SERVE_STATIC_ASSETS=true
+      - DISCOURSE_CDN_URL=http://localhost:3000
       # - APP_ROOT=/var/www/discourse
       # https://github.com/minio/minio/issues/4769
       # - DISCOURSE_USE_S3=true
@@ -42,7 +45,8 @@ services:
       # - DISCOURSE_S3_BACKUP_BUCKET=discourse-backups
       # - DISCOURSE_BACKUP_LOCATION=s3
       # - DISCOURSE_S3_INSTALL_CORS_RULE=false
-    command: bundle exec rails server -b 0.0.0.0 -p 3000 --log-to-stdout
+    # command: bash -c "bundle exec rake assets:precompile && bundle exec rails server -b 0.0.0.0 -p 3000"
+    command: bundle exec rails server -b 0.0.0.0 -p 3000
     ports:
       - "3000:3000"
     depends_on:
