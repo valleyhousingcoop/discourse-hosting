@@ -23,7 +23,7 @@ services:
     build: .
     environment:
       # Need to pretend its not localhost or else will error
-      - DISCOURSE_HOSTNAME=forum.valleyhousing.coop
+      - DISCOURSE_HOSTNAME=forum.valleyhousing.coop:3000
       - DISCOURSE_DB_HOST=db
       - DISCOURSE_DB_PORT=5432
       - DISCOURSE_DB_NAME=postgres
@@ -32,7 +32,6 @@ services:
       - DISCOURSE_REDIS_HOST=redis
       - RAILS_ENV=production
       - DISCOURSE_SERVE_STATIC_ASSETS=true
-      - DISCOURSE_CDN_URL=http://localhost:3000
       # - APP_ROOT=/var/www/discourse
       # https://github.com/minio/minio/issues/4769
       # - DISCOURSE_USE_S3=true
