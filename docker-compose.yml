@@ -3,6 +3,9 @@ services:
     image: postgres
     environment:
       POSTGRES_PASSWORD: password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
   redis:
@@ -13,7 +16,7 @@ services:
     environment:
         REDIS_ARGS: --requirepass password
     volumes:
-      - ./redis-data:/data
+      - ./data/redis:/data
   web:
     extends:
       file: base.docker-compose.yml
@@ -26,8 +29,7 @@ services:
       - db
       - redis
     volumes:
-      - ./assets:/var/www/discourse/public/assets/
-      - ./web-log:/var/www/discourse/log/
+      - ./data/web-log:/var/www/discourse/log/
   sidekiq:
     extends:
       file: base.docker-compose.yml
@@ -38,5 +40,4 @@ services:
       - db
       - redis
     volumes:
-      - ./sidekiq-log:/var/www/discourse/log/
-      - ./uploads:/var/www/discourse/public/uploads/
+      - ./data/sidekiq-log:/var/www/discourse/log/

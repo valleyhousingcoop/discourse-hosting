@@ -1,0 +1,78 @@
+discourse/discourse-adplugin
+discourse/discourse-affiliate
+discourse/discourse-akismet
+# ArgumentError: Unknown migration version "7.0"; expected one of "4.2", "5.0", "5.1", "5.2", "6.0", "6.1"
+# discourse/discourse-algolia
+discourse/discourse-apple-auth
+discourse/discourse-assign
+discourse/discourse-auto-deactivate
+discourse/discourse-bbcode
+discourse/discourse-bbcode-color
+discourse/discourse-cakeday
+discourse/discourse-calendar
+discourse/discourse-canned-replies
+discourse/discourse-categories-suppressed
+discourse/discourse-category-experts
+discourse/discourse-characters-required
+discourse/discourse-chat-integration
+discourse/discourse-checklist
+# Don't install code review bc problems install rugged deb library
+# discourse/discourse-code-review
+discourse/discourse-crowd
+discourse/discourse-data-explorer
+# discourse/discourse-details
+discourse/discourse-docs
+discourse/discourse-encrypt
+discourse/discourse-fontawesome-pro
+discourse/discourse-footnote
+discourse/discourse-github
+discourse/discourse-gradle-issue
+discourse/discourse-graphviz
+discourse/discourse-invite-tokens
+# discourse/discourse-local-dates
+discourse/discourse-login-with-amazon
+discourse/discourse-logster-rate-limit-checker
+discourse/discourse-logster-transporter
+discourse/discourse-lti
+discourse/discourse-math
+discourse/discourse-moderator-attention
+# discourse/discourse-narrative-bot
+# discourse/discourse-nginx-performance-report
+discourse/discourse-no-bump
+discourse/discourse-oauth2-basic
+discourse/discourse-openid-connect
+discourse/discourse-patreon
+discourse/discourse-perspective-api
+discourse/discourse-linkedin-auth
+discourse/discourse-microsoft-auth
+# ArgumentError: wrong number of arguments (given 3, expected 1)
+# discourse/discourse-policy
+# discourse/discourse-presence
+discourse/discourse-prometheus
+discourse/discourse-prometheus-alert-receiver
+discourse/discourse-push-notifications
+discourse/discourse-reactions
+discourse/discourse-restricted-replies
+discourse/discourse-rss-polling
+discourse/discourse-saml
+discourse/discourse-saved-searches
+discourse/discourse-shared-edits
+discourse/discourse-signatures
+discourse/discourse-sitemap
+discourse/discourse-solved
+discourse/discourse-spoiler-alert
+discourse/discourse-staff-alias
+discourse/discourse-steam-login
+discourse/discourse-subscriptions
+discourse/discourse-teambuild
+discourse/discourse-tooltips
+discourse/discourse-translator
+discourse/discourse-user-card-badges
+discourse/discourse-user-notes
+discourse/discourse-vk-auth
+discourse/discourse-voting
+discourse/discourse-yearly-review
+discourse/discourse-zendesk-plugin
+# discourse/lazy-yt
+# discourse/poll
+# discourse/styleguide

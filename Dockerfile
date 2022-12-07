@@ -13,7 +13,7 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloa
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     curl -fsSL https://deb.nodesource.com/setup_19.x | bash - && \
-    apt-get install -y jpegoptim optipng jhead nodejs pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev
+    apt-get install -y jpegoptim optipng jhead nodejs pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev cmake pkg-config libgit2-dev
 
 
 WORKDIR /tmp/oxipng-install
@@ -28,6 +28,9 @@ ENV BUNDLER_VERSION='2.3.22'
 RUN gem install bundler --no-document -v '2.3.22'
 
 
+WORKDIR /home/discourse/discourse
+RUN mkdir -p tmp/sockets log tmp/pids
+
 WORKDIR /var/www/discourse
 RUN git clone --depth 1 --branch v2.8.13 https://github.com/discourse/discourse.git /var/www/discourse
 
@@ -35,13 +38,14 @@ RUN corepack enable
 RUN  --mount=type=cache,target=/root/.yarn \
     YARN_CACHE_FOLDER=/root/.yarn \
     yarn install --production --frozen-lockfile
-
-RUN bundle config set --local without 'test development'
-RUN bundle install --jobs 4
-WORKDIR /home/discourse/discourse
-RUN mkdir -p tmp/sockets log tmp/pids
-WORKDIR /var/www/discourse
-# ADD 999-custom.rb config/initializers/
-ADD auth_logs.diff /tmp/
-RUN git apply /tmp/auth_logs.diff
+ENV RAILS_ENV production
+# RUN bundle config build.rugged --use-system-libraries
+RUN bundle install
+COPY install-plugins.sh plugins.txt ./
+RUN ./install-plugins.sh
+RUN bundle exec rake plugin:install_all_gems
+RUN env LOAD_PLUGINS=0 bundle exec rake plugin:pull_compatible_all
+# Add this patch to allow looking at logs even without admin access, helpful for debugging
+# COPY auth_logs.diff /tmp/
+# RUN git apply /tmp/auth_logs.diff
 CMD ["bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]

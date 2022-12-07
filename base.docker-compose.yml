@@ -12,7 +12,6 @@ services:
       - DISCOURSE_DB_PASSWORD=password
       - DISCOURSE_REDIS_HOST=redis
       - DISCOURSE_REDIS_PASSWORD=password
-      - RAILS_ENV=production
       - DISCOURSE_SERVE_STATIC_ASSETS=true
       - DISCOURSE_DEVELOPER_EMAILS=${EMAIL}
       - DISCOURSE_SMTP_ADDRESS=smtp.sendgrid.net
@@ -21,5 +20,8 @@ services:
       - DISCOURSE_SMTP_PASSWORD=${SEND_GRID_API_KEY}
       - DISCOURSE_SMTP_PORT=587
       - DISCOURSE_SMTP_ENABLE_START_TLS=true
+      - DISCOURSE_CDN_URL=http://${HOSTNAME}:3000
       - NO_AUTH_LOGS=true
-
+    volumes:
+      - ./data/uploads:/var/www/discourse/public/uploads/
+      - ./data/assets:/var/www/discourse/public/assets/

@@ -23,11 +23,9 @@ Then make modify your `/etc/hosts` file to alias your domain to localhost:
 
 
 ```shell
-mkdir web-log sidekiq-log assets
-docker-compose run -e LOAD_PLUGINS=0 --rm web bundle exec rake plugin:pull_compatible_all
-docker-compose run --rm web bundle exec rake db:migrate
-docker-compose run --rm web bundle exec rake themes:update assets:precompile
-docker-compose run --rm web bundle exec rails r  "SiteSetting.notification_email='forum@mydomain.com'"
+mkdir -p data/{uploads,assets,web-log,sidekiq-log,redis,postgres}
+docker-compose run --rm web bundle exec rake db:migrate themes:update assets:precompile
+docker-compose run --rm web bundle exec rails r "SiteSetting.notification_email='forum@mydomain.com'"
 docker-compose up
 ```
 
