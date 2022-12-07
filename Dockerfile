@@ -34,6 +34,7 @@ WORKDIR /home/discourse/discourse
 RUN mkdir -p tmp/sockets log tmp/pids
 
 WORKDIR /var/www/discourse
+RUN mkdir -p /var/www/
 
 RUN git clone --depth 1 --branch $DISCOURSE_TAG https://github.com/discourse/discourse.git /var/www/discourse
 
