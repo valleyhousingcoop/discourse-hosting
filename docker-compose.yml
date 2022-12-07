@@ -21,7 +21,6 @@ services:
     extends:
       file: base.docker-compose.yml
       service: discourse
-    command: bundle exec rails server -b 0.0.0.0 -p 80
     ports:
       - "80:80"
     depends_on:

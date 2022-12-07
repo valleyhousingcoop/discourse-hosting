@@ -1,4 +1,6 @@
 # syntax=docker/dockerfile:1
+ARG DISCOURSE_TAG=v2.8.13
+
 # https://github.com/discourse/discourse/blob/main/docs/DEVELOPER-ADVANCED.md
 # https://hub.docker.com/_/ruby
 
@@ -32,7 +34,8 @@ WORKDIR /home/discourse/discourse
 RUN mkdir -p tmp/sockets log tmp/pids
 
 WORKDIR /var/www/discourse
-RUN git clone --depth 1 --branch v2.8.13 https://github.com/discourse/discourse.git /var/www/discourse
+
+RUN git clone --depth 1 --branch $DISCOURSE_TAG https://github.com/discourse/discourse.git /var/www/discourse
 
 RUN corepack enable
 RUN  --mount=type=cache,target=/root/.yarn \
@@ -48,4 +51,4 @@ RUN env LOAD_PLUGINS=0 bundle exec rake plugin:pull_compatible_all
 # Add this patch to allow looking at logs even without admin access, helpful for debugging
 # COPY auth_logs.diff /tmp/
 # RUN git apply /tmp/auth_logs.diff
-CMD ["bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]
+CMD bundle exec rails server -b 0.0.0.0 -p 80
