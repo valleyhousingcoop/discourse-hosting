@@ -21,10 +21,9 @@ services:
     extends:
       file: base.docker-compose.yml
       service: discourse
-    # command: bash -c "bundle exec rake assets:precompile && bundle exec rails server -b 0.0.0.0 -p 3000"
-    command: bundle exec rails server -b 0.0.0.0 -p 3000
+    command: bundle exec rails server -b 0.0.0.0 -p 80
     ports:
-      - "3000:3000"
+      - "80:80"
     depends_on:
       - db
       - redis

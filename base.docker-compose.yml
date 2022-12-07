@@ -4,7 +4,7 @@ services:
     build: .
     environment:
       # Need to pretend its not localhost or else will error
-      - DISCOURSE_HOSTNAME=${HOSTNAME}:3000
+      - DISCOURSE_HOSTNAME=${HOSTNAME}
       - DISCOURSE_DB_HOST=db
       - DISCOURSE_DB_PORT=5432
       - DISCOURSE_DB_NAME=postgres
@@ -20,7 +20,6 @@ services:
       - DISCOURSE_SMTP_PASSWORD=${SEND_GRID_API_KEY}
       - DISCOURSE_SMTP_PORT=587
       - DISCOURSE_SMTP_ENABLE_START_TLS=true
-      - DISCOURSE_CDN_URL=http://${HOSTNAME}:3000
       - NO_AUTH_LOGS=true
     volumes:
       - ./data/uploads:/var/www/discourse/public/uploads/

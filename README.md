@@ -24,13 +24,14 @@ Then make modify your `/etc/hosts` file to alias your domain to localhost:
 
 ```shell
 mkdir -p data/{uploads,assets,web-log,sidekiq-log,redis,postgres}
-docker-compose run --rm web bundle exec rake db:migrate themes:update assets:precompile
-docker-compose run --rm web bundle exec rails r "SiteSetting.notification_email='forum@mydomain.com'"
-docker-compose up
+docker compose run --rm web bundle exec rake db:migrate themes:update assets:precompile
+docker compose run --rm web bundle exec rails r "SiteSetting.notification_email='forum@mydomain.com'"
+docker compose up db redis -d
+docker compose up web sidekiq
 ```
 
 
-Now open your browser to http://forum.mydomain.com:3000 and you should see the Discourse setup page.
+Now open your browser to http://forum.mydomain.com and you should see the Discourse setup page.
 
 You can also visit `/logs` to see the logs and `/sidekiq` to see the sidekiq dashboard.
 
