@@ -1,6 +1,4 @@
 # syntax=docker/dockerfile:1
-ARG DISCOURSE_TAG=v2.8.13
-
 # https://github.com/discourse/discourse/blob/main/docs/DEVELOPER-ADVANCED.md
 # https://hub.docker.com/_/ruby
 
@@ -34,9 +32,8 @@ WORKDIR /home/discourse/discourse
 RUN mkdir -p tmp/sockets log tmp/pids
 
 WORKDIR /var/www/discourse
-RUN mkdir -p /var/www/
 
-RUN git clone --depth 1 --branch $DISCOURSE_TAG https://github.com/discourse/discourse.git /var/www/discourse
+RUN git clone --depth 1 --branch v2.8.13 https://github.com/discourse/discourse.git /var/www/discourse
 
 RUN corepack enable
 RUN  --mount=type=cache,target=/root/.yarn \
