@@ -24,9 +24,9 @@ Then make modify your `/etc/hosts` file to alias your domain to localhost:
 
 ```shell
 mkdir -p data/{uploads,assets,redis,postgres}
+docker compose up db redis -d
 docker compose run --rm web bundle exec rake db:migrate themes:update assets:precompile
 docker compose run --rm web bundle exec rails r "SiteSetting.notification_email='forum@mydomain.com'"
-docker compose up db redis -d
 docker compose up web sidekiq
 ```
 
