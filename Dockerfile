@@ -49,4 +49,6 @@ RUN env LOAD_PLUGINS=0 bundle exec rake plugin:pull_compatible_all
 # Add this patch to allow looking at logs even without admin access, helpful for debugging
 # COPY auth_logs.diff /tmp/
 # RUN git apply /tmp/auth_logs.diff
-CMD bundle exec rails server -b 0.0.0.0 -p 80
+COPY tail-logs-and.sh /tmp/tail-logs-and.sh
+ENTRYPOINT ["/tmp/tail-logs-and.sh"]
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "80"]

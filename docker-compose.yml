@@ -26,8 +26,6 @@ services:
     depends_on:
       - db
       - redis
-    volumes:
-      - ./data/web-log:/var/www/discourse/log/
   sidekiq:
     extends:
       file: base.docker-compose.yml
@@ -37,5 +35,3 @@ services:
     depends_on:
       - db
       - redis
-    volumes:
-      - ./data/sidekiq-log:/var/www/discourse/log/
