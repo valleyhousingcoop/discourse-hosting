@@ -49,16 +49,16 @@ services:
       - minio
     profiles:
       - dont-start
-  sidekiq:
-    extends:
-      file: base.docker-compose.yml
-      service: discourse
-    # COpied from demon/sidekiq.rb
-    command: /tmp/tail-logs-and.sh bundle exec sidekiq -q critical,8 -q default,4 -q low,2 -q ultra_low,1 --verbose
-    depends_on:
-      - db
-      - redis
-      - minio
+  # sidekiq:
+  #   extends:
+  #     file: base.docker-compose.yml
+  #     service: discourse
+  #   # COpied from demon/sidekiq.rb
+  #   command: /tmp/tail-logs-and.sh bundle exec sidekiq -q critical,8 -q default,4 -q low,2 -q ultra_low,1 --verbose
+  #   depends_on:
+  #     - db
+  #     - redis
+  #     - minio
   minio:
     image: minio/minio
     command: server --console-address :9001 /data

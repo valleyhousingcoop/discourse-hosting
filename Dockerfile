@@ -54,7 +54,7 @@ RUN env LOAD_PLUGINS=0 bundle exec rake plugin:pull_compatible_all
 # Create a file so it looks like static assets have been compiled
 RUN mkdir -p public/assets
 RUN touch public/assets/application.js
-COPY tail-logs-and.sh /tmp/
+COPY start.sh /tmp/
 # COPY 999-custom.rb /var/www/discourse/config/initializers/
 COPY manifest.rake /var/www/discourse/lib/tasks/
-CMD ["/tmp/tail-logs-and.sh", "bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "80"]
+CMD ["/tmp/start.sh"]
