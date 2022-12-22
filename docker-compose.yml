@@ -37,11 +37,11 @@ services:
       - >
         set -ex &&
         bundle exec rake --trace
-          db:migrate
-          themes:update
-          assets:precompile
-          s3:upload_assets
-          manifest:upload &&
+        db:migrate
+        themes:update
+        assets:precompile
+        s3:upload_assets
+        manifest:upload &&
         bundle exec rails r SiteSetting.notification_email=\'${EMAIL_ADDRESS:?err}\'
     depends_on:
       - db
