@@ -1,0 +1,74 @@
+services:
+  - type: web
+    name: discourse
+    env: docker
+    region: ohio
+    plan: free
+    disk:
+      name: data
+      mountPath: /var/www/discourse/public/uploads/
+
+    envVars:
+      - key: DISCOURSE_HOSTNAME
+        sync: false
+      - key: DISCOURSE_DB_HOST
+        fromDatabase:
+          name: discourse
+          property: host
+      - key: DISCOURSE_DB_PORT
+        fromDatabase:
+          name: discourse
+          property: port
+      - key: DISCOURSE_DB_NAME
+        fromDatabase:
+          name: discourse
+          property: database
+      - key: DISCOURSE_DB_USERNAME
+        fromDatabase:
+          name: discourse
+          property: password
+      - key: DISCOURSE_DB_PASSWORD
+        fromDatabase:
+          name: discourse
+          property: password
+      - key: DISCOURSE_REDIS_HOST
+        fromService:
+          type: redis
+          name: discourse-redis
+          property: host
+      - key: DISCOURSE_REDIS_PORT
+        fromService:
+          type: redis
+          name: discourse-redis
+          property: port
+      - key: DISCOURSE_REDIS_PASSWORD
+        fromService:
+          type: redis
+          name: discourse-red
+          property: password
+      - key: DISCOURSE_SERVE_STATIC_ASSETS
+        value: true
+      - key: DISCOURSE_DEVELOPER_EMAILS
+        sync: false
+      - key: DISCOURSE_SMTP_ADDRESS
+        value: smtp.sendgrid.net
+      - key: DISCOURSE_SMTP_DOMAIN
+        sync: false
+      - key: DISCOURSE_SMTP_USER_NAME
+        value: apikey
+      - key: DISCOURSE_SMTP_PASSWORD
+        sync: false
+      - key: DISCOURSE_SMTP_PORT
+        value: 587
+      - key: DISCOURSE_SMTP_ENABLE_START_TLS
+        value: true
+  - type: redis
+    name: discourse-redis
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: everywhere
+    plan: free
+    maxmemoryPolicy: noeviction
+
+databases:
+  - name: discourse

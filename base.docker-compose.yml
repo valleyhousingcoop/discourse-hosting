@@ -20,7 +20,14 @@ services:
       - DISCOURSE_SMTP_PASSWORD=${SEND_GRID_API_KEY}
       - DISCOURSE_SMTP_PORT=587
       - DISCOURSE_SMTP_ENABLE_START_TLS=true
-      - NO_AUTH_LOGS=true
-    volumes:
-      - ./data/uploads:/var/www/discourse/public/uploads/
-      - ./data/assets:/var/www/discourse/public/assets/
+      - DISCOURSE_USE_S3=true
+      - DISCOURSE_S3_REGION=anything
+      - DISCOURSE_S3_ENDPOINT=http://${HOSTNAME}:9000
+      - DISCOURSE_S3_ACCESS_KEY_ID=minioadmin
+      - DISCOURSE_S3_SECRET_ACCESS_KEY=minioadmin
+      - DISCOURSE_S3_BUCKET=assets
+      - DISCOURSE_S3_BACKUP_BUCKET=backup
+      - DISCOURSE_S3_CDN_URL=http://assets.${HOSTNAME}:9000
+      # - DISCOURSE_CDN_URL=http://assets.${HOSTNAME}:9000
+      - DISCOURSE_S3_INSTALL_CORS_RULE=false
+      - DISCOURSE_BACKUP_LOCATION=s3

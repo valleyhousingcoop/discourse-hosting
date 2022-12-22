@@ -49,6 +49,12 @@ RUN env LOAD_PLUGINS=0 bundle exec rake plugin:pull_compatible_all
 # Add this patch to allow looking at logs even without admin access, helpful for debugging
 # COPY auth_logs.diff /tmp/
 # RUN git apply /tmp/auth_logs.diff
-COPY tail-logs-and.sh /tmp/tail-logs-and.sh
-ENTRYPOINT ["/tmp/tail-logs-and.sh"]
-CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "80"]
+
+
+# Create a file so it looks like static assets have been compiled
+RUN mkdir -p public/assets
+RUN touch public/assets/application.js
+COPY tail-logs-and.sh /tmp/
+# COPY 999-custom.rb /var/www/discourse/config/initializers/
+COPY manifest.rake /var/www/discourse/lib/tasks/
+CMD ["/tmp/tail-logs-and.sh", "bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "80"]

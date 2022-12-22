@@ -26,12 +26,70 @@ services:
     depends_on:
       - db
       - redis
+      - minio
+  init:
+    extends:
+      file: base.docker-compose.yml
+      service: discourse
+    command:
+      - bash
+      - "-c"
+      - >
+        set -ex &&
+        bundle exec rake --trace
+          db:migrate
+          themes:update
+          assets:precompile
+          s3:upload_assets
+          manifest:upload &&
+        bundle exec rails r SiteSetting.notification_email=\'${EMAIL_ADDRESS:?err}\'
+    depends_on:
+      - db
+      - redis
+      - minio
+    profiles:
+      - dont-start
   sidekiq:
     extends:
       file: base.docker-compose.yml
       service: discourse
     # COpied from demon/sidekiq.rb
-    command: bundle exec sidekiq -q critical,8 -q default,4 -q low,2 -q ultra_low,1 --verbose
+    command: /tmp/tail-logs-and.sh bundle exec sidekiq -q critical,8 -q default,4 -q low,2 -q ultra_low,1 --verbose
     depends_on:
       - db
       - redis
+      - minio
+  minio:
+    image: minio/minio
+    command: server --console-address :9001 /data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./data/minio:/data
+    environment:
+      MINIO_DOMAIN: "${HOSTNAME:?err}"
+    networks:
+      default:
+        aliases:
+          - assets.${HOSTNAME:?err}
+          - backup.${HOSTNAME:?err}
+  # Run command on start
+  # https://github.com/minio/mc/issues/3144
+  # Set bucket to allow downloads
+  # https://github.com/rishabhnambiar/discourse-docs/blob/master/minio.md#step-4-setting-an-upload-bucket-policy-skip-if-not-using-minio-for-image-uploads
+  mc:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add local http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb --quiet local/assets/;
+      /usr/bin/mc anonymous set download local/assets;
+      "
+    profiles:
+      - dont-start
+
+networks:
+  default:

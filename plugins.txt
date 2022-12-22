@@ -8,7 +8,11 @@ discourse/discourse-assign
 discourse/discourse-auto-deactivate
 discourse/discourse-bbcode
 discourse/discourse-bbcode-color
-discourse/discourse-cakeday
+# Error loading at runtime
+# _vendor-e356674b67559130cbeca4530a0a5a00e71144f5e7556902f8a5efc8ac3f2282.js:4069 Uncaught TypeError: e.addCommunitySectionLink is not a function
+#     at _discourse-cakeday-f1cb65ed4faa4049ccafdb0223fd092f58da582df5110decf352107f9e420c3d.js:593:15
+#    at _discourse-cakeday-f1cb65ed4faa4049ccafdb0223fd092f58da582df5110decf352107f9e420c3d.js:633:16
+# discourse/discourse-cakeday
 discourse/discourse-calendar
 discourse/discourse-canned-replies
 discourse/discourse-categories-suppressed
