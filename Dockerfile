@@ -4,7 +4,7 @@
 
 # Use Ruby < 3.1 to avoid missing net/pop error
 # https://github.com/discourse/discourse/pull/15692/files
-FROM ruby:3.0
+FROM ruby:3.1
 
 ENV LANG C.UTF-8
 
@@ -12,7 +12,7 @@ ENV LANG C.UTF-8
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    curl -fsSL https://deb.nodesource.com/setup_19.x | bash - && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y jpegoptim optipng jhead nodejs pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev cmake pkg-config libgit2-dev
 
 
@@ -33,7 +33,7 @@ RUN mkdir -p tmp/sockets log tmp/pids
 
 WORKDIR /var/www/discourse
 
-RUN git clone --depth 1 --branch v2.8.13 https://github.com/discourse/discourse.git /var/www/discourse
+RUN git clone --depth 1 --branch main https://github.com/discourse/discourse.git /var/www/discourse
 
 RUN corepack enable
 RUN  --mount=type=cache,target=/root/.yarn \
@@ -41,6 +41,8 @@ RUN  --mount=type=cache,target=/root/.yarn \
     yarn install --production --frozen-lockfile
 ENV RAILS_ENV production
 # RUN bundle config build.rugged --use-system-libraries
+RUN bundle config --local deployment true
+RUN bundle config --local without test development
 RUN bundle install
 COPY install-plugins.sh plugins.txt ./
 RUN ./install-plugins.sh
@@ -57,4 +59,6 @@ RUN touch public/assets/application.js
 COPY start.sh /tmp/
 # COPY 999-custom.rb /var/www/discourse/config/initializers/
 COPY manifest.rake /var/www/discourse/lib/tasks/
+ENV UNICORN_BIND_ALL=1 UNICORN_WORKERS=2 UNICORN_PORT=80 UNICORN_SIDEKIQS=1
+ENV DISCOURSE_DISABLE_ANON_CACHE=1
 CMD ["/tmp/start.sh"]

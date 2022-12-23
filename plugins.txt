@@ -62,7 +62,6 @@ discourse/discourse-saml
 discourse/discourse-saved-searches
 discourse/discourse-shared-edits
 discourse/discourse-signatures
-discourse/discourse-sitemap
 discourse/discourse-solved
 discourse/discourse-spoiler-alert
 discourse/discourse-staff-alias
