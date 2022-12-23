@@ -83,6 +83,7 @@ helper.request = OpenStruct.new(:env => {'HTTP_ACCEPT_ENCODING' => 'gzip, deflat
 helper.preload_script("vendor")
 ActionController::Base.helpers.asset_path("vendor.js")
 ```
+
 ## About
 
 We run the sidekiq alongside the web process in the same container. This is so that they can share a mounted volume [in Render](https://render.com/docs/disks) which cannot be shared accross containers. Alternatively,

@@ -22,10 +22,46 @@ services:
       file: base.docker-compose.yml
       service: discourse
     ports:
-      - "80:80"
+      - "80"
     depends_on:
       - db
       - redis
+      - minio
+  # Reverse proxy to differentiate based on domain, which server to use
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    entrypoint:
+      - bash
+      - "-c"
+      - >
+        set -ex &&
+        echo '
+        events {
+
+        }
+        http {
+          server {
+              listen 80;
+              server_name assets.${HOSTNAME:?err};
+              location / {
+                  proxy_set_header Host $$http_host;
+                  proxy_pass http://minio;
+              }
+          }
+          server {
+              listen 80;
+              server_name ${HOSTNAME:?err};
+              location / {
+                  proxy_set_header Host $$http_host;
+                  proxy_pass http://web;
+              }
+          }
+        }' > /etc/nginx/nginx.conf &&
+        nginx -g 'daemon off;'
+    depends_on:
+      - web
       - minio
   init:
     extends:
@@ -50,21 +86,11 @@ services:
       - minio
     profiles:
       - dont-start
-  # sidekiq:
-  #   extends:
-  #     file: base.docker-compose.yml
-  #     service: discourse
-  #   # COpied from demon/sidekiq.rb
-  #   command: /tmp/tail-logs-and.sh bundle exec sidekiq -q critical,8 -q default,4 -q low,2 -q ultra_low,1 --verbose
-  #   depends_on:
-  #     - db
-  #     - redis
-  #     - minio
   minio:
     image: minio/minio
-    command: server --console-address :9001 /data
+    command: server --address :80 --console-address :9001 /data
     ports:
-      - "9000:9000"
+      - "80"
       - "9001:9001"
     volumes:
       - ./data/minio:/data
@@ -85,7 +111,7 @@ services:
       - minio
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host add local http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc config host add local http://minio minioadmin minioadmin;
       /usr/bin/mc mb --quiet local/assets/;
       /usr/bin/mc anonymous set download local/assets;
       "
