@@ -43,6 +43,7 @@ services:
         s3:upload_assets
         manifest:upload &&
         bundle exec rails r SiteSetting.notification_email=\'${EMAIL_ADDRESS:?err}\'
+        bundle exec rails r SiteSetting.content_security_policy=false
     depends_on:
       - db
       - redis
@@ -73,7 +74,7 @@ services:
       default:
         aliases:
           - assets.${HOSTNAME:?err}
-          - backup.${HOSTNAME:?err}
+          # - backup.${HOSTNAME:?err}
   # Run command on start
   # https://github.com/minio/mc/issues/3144
   # Set bucket to allow downloads

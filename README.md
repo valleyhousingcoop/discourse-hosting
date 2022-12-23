@@ -38,8 +38,6 @@ docker compose up db redis minio -d
 # Create bucket
 docker compose run --rm mc
 docker compose run --rm init
-# Disable CSP, since it blocks the root resources on the s3 CDN
-# docker compose run --rm web bundle exec rails r "SiteSetting.content_security_policy=false"
 docker compose up web
 ```
 
