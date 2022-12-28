@@ -6,6 +6,7 @@ services:
     plan: starter
     healthCheckPath: /srv/status
     dockerfilePath: discourse.Dockerfile
+    initialDeployHook: init.sh
     envVars:
       - key: DISCOURSE_HOSTNAME
         sync: false
