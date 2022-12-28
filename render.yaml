@@ -83,7 +83,7 @@ services:
     name: discourse-minio
     env: docker
     region: ohio
-    plan: free
+    plan: starter
     dockerfilePath: minio.Dockerfile
     healthCheckPath: /minio/health/live
     disk:
