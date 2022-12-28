@@ -69,10 +69,7 @@ services:
       - key: DISCOURSE_S3_ACCESS_KEY_ID
         value: minioadmin
       - key: DISCOURSE_S3_SECRET_ACCESS_KEY
-        fromService:
-          type: web
-          name: discourse-minio
-          envVarKey: MINIO_ROOT_PASSWORD
+        generateValue: true
       - key: DISCOURSE_S3_BUCKET
         value: assets
       - key: DISCOURSE_S3_INSTALL_CORS_RULE
@@ -99,6 +96,9 @@ services:
           name: discourse
           envVarKey: DISCOURSE_HOSTNAME
       - key: MINIO_ROOT_PASSWORD
-        generateValue: true
+        fromService:
+          type: web
+          name: discourse
+          envVarKey: DISCOURSE_S3_SECRET_ACCESS_KEY
 databases:
   - name: discourse
