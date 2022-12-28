@@ -3,7 +3,7 @@ services:
     name: discourse
     env: docker
     region: ohio
-    plan: free
+    plan: starter
     healthCheckPath: /srv/status
     dockerCommand: >
       env
