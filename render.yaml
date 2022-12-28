@@ -9,7 +9,10 @@ services:
     initialDeployHook: init.sh
     envVars:
       - key: DISCOURSE_HOSTNAME
-        sync: false
+        fromService:
+          type: web
+          name: discourse-minio
+          envVarKey: MINIO_DOMAIN
       - key: DISCOURSE_DB_HOST
         fromDatabase:
           name: discourse
@@ -52,7 +55,10 @@ services:
       - key: DISCOURSE_SMTP_PASSWORD
         sync: false
       - key: DISCOURSE_S3_SECRET_ACCESS_KEY
-        generateValue: true
+        fromService:
+          type: web
+          name: discourse-minio
+          envVarKey: MINIO_ROOT_PASSWORD
       - key: DISCOURSE_NOTIFICATION_EMAIL
         sync: false
   - type: redis
@@ -73,15 +79,9 @@ services:
       mountPath: /data
     envVars:
       - key: MINIO_DOMAIN
-        fromService:
-          type: web
-          name: discourse
-          envVarKey: DISCOURSE_HOSTNAME
+        sync: false
       - key: MINIO_ROOT_PASSWORD
-        fromService:
-          type: web
-          name: discourse
-          envVarKey: DISCOURSE_S3_SECRET_ACCESS_KEY
+        generateValue: true
 databases:
   - name: discourse
     region: ohio
