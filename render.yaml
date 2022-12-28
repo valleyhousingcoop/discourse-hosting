@@ -104,3 +104,4 @@ services:
 databases:
   - name: discourse
     region: ohio
+    ipAllowList: []
