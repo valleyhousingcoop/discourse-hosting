@@ -87,7 +87,7 @@ services:
     env: docker
     region: ohio
     plan: free
-    dockerFile: minio.Dockerfile
+    dockerfilePath: minio.Dockerfile
     healthCheckPath: /minio/health/live
     disk:
       name: minio-data
