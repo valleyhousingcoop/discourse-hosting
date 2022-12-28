@@ -79,6 +79,7 @@ services:
     ipAllowList: []
     plan: free
     maxmemoryPolicy: noeviction
+    region: ohio
   - type: web
     name: discourse-minio
     env: docker
@@ -102,3 +103,4 @@ services:
           envVarKey: DISCOURSE_S3_SECRET_ACCESS_KEY
 databases:
   - name: discourse
+    region: ohio
