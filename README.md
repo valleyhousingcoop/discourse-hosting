@@ -6,6 +6,18 @@ This does not use the Docker images provided by discourse, instead opting to bui
 service can be broken up into its own docker container and we can build it with more traditional Docker tools
 instead of the wrapper provided by Discourse.
 
+
+## Hosted with Render
+
+This repository can be deployed as a blueprint on Render.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/saulshanabrook/discourse-hosting)
+
+
+After deploying, you probably want to run the initial migrations and trigger the static build of assets:
+
+
+
 ## Local Development with Docker Compose
 
 First populate the .env file with the following:
@@ -34,8 +46,8 @@ Then run the following commands:
 
 ```shell
 mkdir -p data/{minio,redis,postgres}
-docker compose up db redis minio -d
-docker compose run --rm init
+docker compose up db redis minio nginx -d
+docker compose run --rm web init.sh
 docker compose up web
 ```
 
@@ -48,6 +60,13 @@ You can also visit http://localhost:8001 to see the redis GUI, use the password 
 
 The Minio GUI is available at http://localhost:9001. The default username and pw is `minioadmin`.
 
+
+To remove all the data, run:
+
+```shell
+docker compose down -v
+rm -rf data/*/**
+```
 
 ## Debugging
 

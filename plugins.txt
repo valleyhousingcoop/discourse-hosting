@@ -1,13 +1,13 @@
-discourse/discourse-adplugin
-discourse/discourse-affiliate
+# discourse/discourse-adplugin
+# discourse/discourse-affiliate
 discourse/discourse-akismet
 # ArgumentError: Unknown migration version "7.0"; expected one of "4.2", "5.0", "5.1", "5.2", "6.0", "6.1"
 # discourse/discourse-algolia
 discourse/discourse-apple-auth
 discourse/discourse-assign
 discourse/discourse-auto-deactivate
-discourse/discourse-bbcode
-discourse/discourse-bbcode-color
+# discourse/discourse-bbcode
+# discourse/discourse-bbcode-color
 # Error loading at runtime
 # _vendor-e356674b67559130cbeca4530a0a5a00e71144f5e7556902f8a5efc8ac3f2282.js:4069 Uncaught TypeError: e.addCommunitySectionLink is not a function
 #     at _discourse-cakeday-f1cb65ed4faa4049ccafdb0223fd092f58da582df5110decf352107f9e420c3d.js:593:15
@@ -22,22 +22,22 @@ discourse/discourse-chat-integration
 discourse/discourse-checklist
 # Don't install code review bc problems install rugged deb library
 # discourse/discourse-code-review
-discourse/discourse-crowd
+# discourse/discourse-crowd
 discourse/discourse-data-explorer
 # discourse/discourse-details
 discourse/discourse-docs
-discourse/discourse-encrypt
+# discourse/discourse-encrypt
 discourse/discourse-fontawesome-pro
 discourse/discourse-footnote
 discourse/discourse-github
-discourse/discourse-gradle-issue
+# discourse/discourse-gradle-issue
 discourse/discourse-graphviz
 discourse/discourse-invite-tokens
 # discourse/discourse-local-dates
-discourse/discourse-login-with-amazon
+# discourse/discourse-login-with-amazon
 discourse/discourse-logster-rate-limit-checker
 discourse/discourse-logster-transporter
-discourse/discourse-lti
+# discourse/discourse-lti
 discourse/discourse-math
 discourse/discourse-moderator-attention
 # discourse/discourse-narrative-bot
@@ -47,8 +47,8 @@ discourse/discourse-oauth2-basic
 discourse/discourse-openid-connect
 discourse/discourse-patreon
 discourse/discourse-perspective-api
-discourse/discourse-linkedin-auth
-discourse/discourse-microsoft-auth
+# discourse/discourse-linkedin-auth
+# discourse/discourse-microsoft-auth
 # ArgumentError: wrong number of arguments (given 3, expected 1)
 # discourse/discourse-policy
 # discourse/discourse-presence
@@ -58,24 +58,24 @@ discourse/discourse-push-notifications
 discourse/discourse-reactions
 discourse/discourse-restricted-replies
 discourse/discourse-rss-polling
-discourse/discourse-saml
+# discourse/discourse-saml
 discourse/discourse-saved-searches
 discourse/discourse-shared-edits
-discourse/discourse-signatures
+# discourse/discourse-signatures
 discourse/discourse-solved
 discourse/discourse-spoiler-alert
 discourse/discourse-staff-alias
-discourse/discourse-steam-login
-discourse/discourse-subscriptions
-discourse/discourse-teambuild
+# discourse/discourse-steam-login
+# discourse/discourse-subscriptions
+# discourse/discourse-teambuild
 discourse/discourse-tooltips
-discourse/discourse-translator
+# discourse/discourse-translator
 discourse/discourse-user-card-badges
-discourse/discourse-user-notes
-discourse/discourse-vk-auth
+# discourse/discourse-user-notes
+# discourse/discourse-vk-auth
 discourse/discourse-voting
 discourse/discourse-yearly-review
-discourse/discourse-zendesk-plugin
+# discourse/discourse-zendesk-plugin
 # discourse/lazy-yt
 # discourse/poll
 # discourse/styleguide

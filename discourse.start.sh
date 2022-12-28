@@ -5,9 +5,14 @@ bundle exec rake manifest:download
 # https://docs.docker.com/config/containers/multi-service_container/
 # /var/www/discourse/log/production.log
 touch log/unicorn.stderr.log log/unicorn.stdout.log
+
+trap 'kill -TERM $TAIL_PID $UNICORN_PID' TERM INT
 tail -f  log/* &
-# bin/unicorn
-bundle exec unicorn -c config/unicorn.conf.rb
+TAIL_PID=$!
+bundle exec unicorn -c config/unicorn.conf.rb &
+UNICORN_PID=$!
+wait $TAIL_PID $UNICORN_PID
+
 # bundle exec rails server -b 0.0.0.0 -p 80 &
 # bundle exec sidekiq -q critical,8 -q default,4 -q low,2 -q ultra_low,1 --verbose &
 

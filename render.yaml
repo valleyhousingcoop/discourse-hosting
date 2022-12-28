@@ -5,11 +5,12 @@ services:
     region: ohio
     plan: starter
     healthCheckPath: /srv/status
+    dockerfilePath: discourse.Dockerfile
     dockerCommand: >
       env
       DISCOURSE_S3_ENDPOINT=http://$DISCOURSE_HOSTNAME
       DISCOURSE_S3_CDN_URL=//assets.$DISCOURSE_HOSTNAME
-      /tmp/start.sh
+      start.sh
     envVars:
       - key: DISCOURSE_HOSTNAME
         sync: false
@@ -74,6 +75,8 @@ services:
         value: assets
       - key: DISCOURSE_S3_INSTALL_CORS_RULE
         value: false
+      - key: DISCOURSE_NOTIFICATION_EMAIL
+        sync: false
   - type: redis
     name: discourse-redis
     ipAllowList: []

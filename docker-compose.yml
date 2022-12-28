@@ -18,11 +18,40 @@ services:
     volumes:
       - ./data/redis:/data
   web:
-    extends:
-      file: base.docker-compose.yml
-      service: discourse
-    ports:
-      - "80"
+    image: discourse
+    build:
+      context: .
+      dockerfile: discourse.Dockerfile
+    environment:
+      # Need to pretend its not localhost or else will error
+      - DISCOURSE_HOSTNAME=${HOSTNAME}
+      - DISCOURSE_DB_HOST=db
+      - DISCOURSE_DB_PORT=5432
+      - DISCOURSE_DB_NAME=postgres
+      - DISCOURSE_DB_USERNAME=postgres
+      - DISCOURSE_DB_PASSWORD=password
+      - DISCOURSE_REDIS_HOST=redis
+      - DISCOURSE_REDIS_PASSWORD=password
+      # - DISCOURSE_SERVE_STATIC_ASSETS=false
+      - DISCOURSE_DEVELOPER_EMAILS=${EMAIL}
+      - DISCOURSE_SMTP_ADDRESS=smtp.sendgrid.net
+      - DISCOURSE_SMTP_DOMAIN=${EMAIL_DOMAIN}
+      - DISCOURSE_SMTP_USER_NAME=apikey
+      - DISCOURSE_SMTP_PASSWORD=${SEND_GRID_API_KEY}
+      - DISCOURSE_SMTP_PORT=587
+      - DISCOURSE_SMTP_ENABLE_START_TLS=true
+      - DISCOURSE_USE_S3=true
+      - DISCOURSE_S3_REGION=anything
+      - DISCOURSE_S3_ENDPOINT=http://${HOSTNAME}
+      - DISCOURSE_S3_ACCESS_KEY_ID=minioadmin
+      - DISCOURSE_S3_SECRET_ACCESS_KEY=minioadmin
+      - DISCOURSE_S3_BUCKET=assets
+      - DISCOURSE_S3_CDN_URL=//assets.${HOSTNAME}
+      - DISCOURSE_S3_INSTALL_CORS_RULE=false
+      - EMAIL_ADDRESS=${EMAIL_ADDRESS}
+      - DISCOURSE_NOTIFICATION_EMAIL=${DISCOURSE_NOTIFICATION_EMAIL}
+      # - DISCOURSE_S3_BACKUP_BUCKET=backup
+      # - DISCOURSE_BACKUP_LOCATION=s3
     depends_on:
       - db
       - redis
@@ -63,31 +92,7 @@ services:
     depends_on:
       - web
       - minio
-  init:
-    extends:
-      file: base.docker-compose.yml
-      service: discourse
-    command:
-      - bash
-      - "-c"
-      - >
-        set -ex &&
-        bundle exec rake --trace
-        db:migrate
-        themes:update
-        assets:precompile
-        s3:upload_assets
-        manifest:upload &&
-        bundle exec rails r SiteSetting.notification_email=\'${EMAIL_ADDRESS:?err}\'
-        bundle exec rails r SiteSetting.content_security_policy=false
-    depends_on:
-      - db
-      - redis
-      - minio
-    profiles:
-      - dont-start
   minio:
-    image: discourse
     build:
       context: .
       dockerfile: minio.Dockerfile
