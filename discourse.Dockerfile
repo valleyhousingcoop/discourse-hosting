@@ -59,8 +59,12 @@ RUN mkdir -p public/assets
 RUN touch public/assets/application.js
 COPY discourse.start.sh /usr/bin/start.sh
 COPY discourse.init.sh /usr/bin/init.sh
+COPY discourse.entrypoint.sh /usr/bin/entrypoint.sh
+ENTRYPOINT [ "/usr/bin/entrypoint.sh" ]
 # COPY 999-custom.rb /var/www/discourse/config/initializers/
 COPY manifest.rake /var/www/discourse/lib/tasks/
 ENV UNICORN_BIND_ALL=1 UNICORN_WORKERS=2 UNICORN_PORT=80 UNICORN_SIDEKIQS=1
 ENV DISCOURSE_DISABLE_ANON_CACHE=1 DISCOURSE_SERVE_STATIC_ASSETS=true
+ENV DISCOURSE_SMTP_ADDRESS=smtp.sendgrid.net DISCOURSE_SMTP_USER_NAME=apikey DISCOURSE_SMTP_PORT=587 DISCOURSE_SMTP_ENABLE_START_TLS=true
+ENV DISCOURSE_USE_S3=true DISCOURSE_S3_REGION=anything DISCOURSE_S3_ACCESS_KEY_ID=minioadmin DISCOURSE_S3_BUCKET=assets DISCOURSE_S3_INSTALL_CORS_RULE=false
 CMD ["start.sh"]

@@ -6,11 +6,6 @@ services:
     plan: starter
     healthCheckPath: /srv/status
     dockerfilePath: discourse.Dockerfile
-    dockerCommand: >
-      env
-      DISCOURSE_S3_ENDPOINT=http://$DISCOURSE_HOSTNAME
-      DISCOURSE_S3_CDN_URL=//assets.$DISCOURSE_HOSTNAME
-      start.sh
     envVars:
       - key: DISCOURSE_HOSTNAME
         sync: false
@@ -51,30 +46,12 @@ services:
       #     property: password
       - key: DISCOURSE_DEVELOPER_EMAILS
         sync: false
-      - key: DISCOURSE_SMTP_ADDRESS
-        value: smtp.sendgrid.net
       - key: DISCOURSE_SMTP_DOMAIN
         sync: false
-      - key: DISCOURSE_SMTP_USER_NAME
-        value: apikey
       - key: DISCOURSE_SMTP_PASSWORD
         sync: false
-      - key: DISCOURSE_SMTP_PORT
-        value: 587
-      - key: DISCOURSE_SMTP_ENABLE_START_TLS
-        value: true
-      - key: DISCOURSE_USE_s3
-        value: true
-      - key: DISCOURSE_S3_REGION
-        value: whatever
-      - key: DISCOURSE_S3_ACCESS_KEY_ID
-        value: minioadmin
       - key: DISCOURSE_S3_SECRET_ACCESS_KEY
         generateValue: true
-      - key: DISCOURSE_S3_BUCKET
-        value: assets
-      - key: DISCOURSE_S3_INSTALL_CORS_RULE
-        value: false
       - key: DISCOURSE_NOTIFICATION_EMAIL
         sync: false
   - type: redis

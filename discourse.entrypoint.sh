@@ -1,0 +1,6 @@
+#!/bin/bash
+set -ex
+
+export DISCOURSE_S3_ENDPOINT=http://$DISCOURSE_HOSTNAME  DISCOURSE_S3_CDN_URL=//assets.$DISCOURSE_HOSTNAME
+
+exec "$@"
