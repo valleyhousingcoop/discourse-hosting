@@ -4,10 +4,12 @@ services:
     env: docker
     region: ohio
     plan: free
-    disk:
-      name: data
-      mountPath: /var/www/discourse/public/uploads/
-
+    healthCheckPath: /srv/status
+    dockerCommand: >
+      env
+      DISCOURSE_S3_ENDPOINT=http://$DISCOURSE_HOSTNAME
+      DISCOURSE_S3_CDN_URL=//assets.$DISCOURSE_HOSTNAME
+      /tmp/start.sh
     envVars:
       - key: DISCOURSE_HOSTNAME
         sync: false
@@ -26,7 +28,7 @@ services:
       - key: DISCOURSE_DB_USERNAME
         fromDatabase:
           name: discourse
-          property: password
+          property: user
       - key: DISCOURSE_DB_PASSWORD
         fromDatabase:
           name: discourse
@@ -46,8 +48,6 @@ services:
           type: redis
           name: discourse-red
           property: password
-      - key: DISCOURSE_SERVE_STATIC_ASSETS
-        value: true
       - key: DISCOURSE_DEVELOPER_EMAILS
         sync: false
       - key: DISCOURSE_SMTP_ADDRESS
@@ -62,13 +62,43 @@ services:
         value: 587
       - key: DISCOURSE_SMTP_ENABLE_START_TLS
         value: true
+      - key: DISCOURSE_USE_s3
+        value: true
+      - key: DISCOURSE_S3_REGION
+        value: whatever
+      - key: DISCOURSE_S3_ACCESS_KEY_ID
+        value: minioadmin
+      - key: DISCOURSE_S3_SECRET_ACCESS_KEY
+        fromService:
+          type: web
+          name: discourse-minio
+          envVarKey: MINIO_ROOT_PASSWORD
+      - key: DISCOURSE_S3_BUCKET
+        value: assets
+      - key: DISCOURSE_S3_INSTALL_CORS_RULE
+        value: false
   - type: redis
     name: discourse-redis
-    ipAllowList:
-      - source: 0.0.0.0/0
-        description: everywhere
+    ipAllowList: []
     plan: free
     maxmemoryPolicy: noeviction
-
+  - type: web
+    name: discourse-minio
+    env: docker
+    region: ohio
+    plan: free
+    dockerFile: minio.Dockerfile
+    healthCheckPath: /minio/health/live
+    disk:
+      name: minio-data
+      mountPath: /data
+    envVars:
+      - key: MINIO_DOMAIN
+        fromService:
+          type: web
+          name: discourse
+          envVarKey: DISCOURSE_HOSTNAME
+      - key: MINIO_ROOT_PASSWORD
+        generateValue: true
 databases:
   - name: discourse

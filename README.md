@@ -35,8 +35,6 @@ Then run the following commands:
 ```shell
 mkdir -p data/{minio,redis,postgres}
 docker compose up db redis minio -d
-# Create bucket
-docker compose run --rm mc
 docker compose run --rm init
 docker compose up web
 ```

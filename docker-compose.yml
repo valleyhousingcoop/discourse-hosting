@@ -87,10 +87,11 @@ services:
     profiles:
       - dont-start
   minio:
-    image: minio/minio
-    command: server --address :80 --console-address :9001 /data
+    image: discourse
+    build:
+      context: .
+      dockerfile: minio.Dockerfile
     ports:
-      - "80"
       - "9001:9001"
     volumes:
       - ./data/minio:/data
@@ -101,22 +102,6 @@ services:
         aliases:
           - assets.${HOSTNAME:?err}
           # - backup.${HOSTNAME:?err}
-  # Run command on start
-  # https://github.com/minio/mc/issues/3144
-  # Set bucket to allow downloads
-  # https://github.com/rishabhnambiar/discourse-docs/blob/master/minio.md#step-4-setting-an-upload-bucket-policy-skip-if-not-using-minio-for-image-uploads
-  mc:
-    image: minio/mc:latest
-    depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc config host add local http://minio minioadmin minioadmin;
-      /usr/bin/mc mb --quiet local/assets/;
-      /usr/bin/mc anonymous set download local/assets;
-      "
-    profiles:
-      - dont-start
 
 networks:
   default:
