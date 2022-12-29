@@ -63,6 +63,7 @@ COPY discourse.entrypoint.sh /usr/bin/entrypoint.sh
 ENTRYPOINT [ "/usr/bin/entrypoint.sh" ]
 # COPY 999-custom.rb /var/www/discourse/config/initializers/
 COPY manifest.rake /var/www/discourse/lib/tasks/
+EXPOSE 80
 ENV UNICORN_BIND_ALL=1 UNICORN_WORKERS=2 UNICORN_PORT=80 UNICORN_SIDEKIQS=1
 ENV DISCOURSE_DISABLE_ANON_CACHE=1 DISCOURSE_SERVE_STATIC_ASSETS=true
 ENV DISCOURSE_SMTP_ADDRESS=smtp.sendgrid.net DISCOURSE_SMTP_USER_NAME=apikey DISCOURSE_SMTP_PORT=587 DISCOURSE_SMTP_ENABLE_START_TLS=true
