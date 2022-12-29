@@ -60,6 +60,13 @@ You can also visit http://localhost:8001 to see the redis GUI, use the password 
 
 The Minio GUI is available at http://localhost:9001. The default username and pw is `minioadmin`.
 
+To import emails:
+
+```shell
+mkdir -p data/import/emails
+mv some-mailbox.mbox data/import/emails
+dc run -v $PWD/data/import:/shared/import/data --rm web bundle exec ruby script/import_scripts/mbox.rb /var/www/discourse/script/import_scripts/mbox/settings.yml
+```
 
 To remove all the data, run:
 
@@ -67,6 +74,7 @@ To remove all the data, run:
 docker compose down -v
 rm -rf data/*/**
 ```
+
 
 ## Debugging
 

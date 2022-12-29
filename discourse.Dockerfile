@@ -13,7 +13,7 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloa
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y jpegoptim optipng jhead nodejs pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev cmake pkg-config libgit2-dev
+    apt-get install -y jpegoptim optipng jhead nodejs pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev cmake pkg-config libgit2-dev libsqlite3-dev
 
 
 WORKDIR /tmp/oxipng-install
@@ -42,8 +42,8 @@ RUN  --mount=type=cache,target=/root/.yarn \
     yarn install --production --frozen-lockfile
 ENV RAILS_ENV production
 # RUN bundle config build.rugged --use-system-libraries
-RUN bundle config --local deployment true
 RUN bundle config --local without test development
+RUN echo "gem 'sqlite3'" >> Gemfile
 RUN bundle install
 COPY discourse.install-plugins.sh plugins.txt ./
 RUN ./discourse.install-plugins.sh
