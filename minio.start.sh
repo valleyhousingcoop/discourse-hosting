@@ -6,9 +6,10 @@ set -ex
 # https://veithen.io/2014/11/16/sigterm-propagation.html
 trap 'kill -TERM $PID' TERM INT
 
+export MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
 docker-entrypoint.sh server --address :80 --console-address :9001 /data &
 PID=$!
-until mc alias set local http://localhost minioadmin ${MINIO_ROOT_PASSWORD:-minioadmin}; do
+until mc alias set local http://localhost minioadmin ${MINIO_ROOT_PASSWORD}; do
     sleep 0.5;
 done;
 
