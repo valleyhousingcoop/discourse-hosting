@@ -6,7 +6,11 @@ services:
     plan: starter
     healthCheckPath: /srv/status
     dockerfilePath: discourse.Dockerfile
-    initialDeployHook: init.sh
+    buildFilter:
+      ignoredPaths:
+        - README.md
+        - .gitignore
+        - minio*
     envVars:
       - key: DISCOURSE_HOSTNAME
         fromService:
@@ -74,6 +78,9 @@ services:
     plan: starter
     dockerfilePath: minio.Dockerfile
     healthCheckPath: /minio/health/live
+    buildFilter:
+      paths:
+        - minio*
     disk:
       name: minio-data
       mountPath: /data
