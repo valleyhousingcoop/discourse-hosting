@@ -22,8 +22,9 @@ services:
     build:
       context: .
       dockerfile: discourse.Dockerfile
+      args:
+        - DISCOURSE_HOSTNAME=${HOSTNAME}
     environment:
-      - DISCOURSE_HOSTNAME=${HOSTNAME}
       - DISCOURSE_DB_HOST=db
       - DISCOURSE_DB_PORT=5432
       - DISCOURSE_DB_NAME=postgres

@@ -1,6 +1,11 @@
 #!/bin/bash
 set -ex -o pipefail
-bundle exec rake manifest:download
+
+bundle exec rake --trace \
+    db:migrate \
+    s3:upload_assets
+
+bundle exec rails r SiteSetting.notification_email=\'${EMAIL_ADDRESS}\'
 
 # https://docs.docker.com/config/containers/multi-service_container/
 # /var/www/discourse/log/production.log

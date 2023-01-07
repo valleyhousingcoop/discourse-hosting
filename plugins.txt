@@ -39,7 +39,8 @@ discourse/discourse-logster-rate-limit-checker
 discourse/discourse-logster-transporter
 # discourse/discourse-lti
 discourse/discourse-math
-discourse/discourse-moderator-attention
+# Uses raw_connection.async_exe in init which breaks when running with sqlite
+#discourse/discourse-moderator-attention
 # discourse/discourse-narrative-bot
 # discourse/discourse-nginx-performance-report
 discourse/discourse-no-bump

@@ -46,9 +46,9 @@ Then run the following commands:
 
 ```shell
 mkdir -p data/{minio,redis,postgres}
-docker compose up db redis minio nginx -d
-docker compose run --rm web init.sh
-docker compose up web
+docker compose up db redis minio -d
+# docker compose run --rm web init.sh
+docker compose up web nginx
 ```
 
 
