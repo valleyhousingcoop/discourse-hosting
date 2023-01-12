@@ -5,6 +5,7 @@
 # Use Ruby < 3.1 to avoid missing net/pop error
 # https://github.com/discourse/discourse/pull/15692/files
 FROM ruby:3.1
+LABEL org.opencontainers.image.source="https://github.com/saulshanabrook/discourse-hosting"
 
 ENV LANG C.UTF-8
 
