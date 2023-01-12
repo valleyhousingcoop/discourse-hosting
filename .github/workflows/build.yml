@@ -25,3 +25,6 @@ jobs:
           file: ./discourse.Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            DISCOURSE_S3_BUCKET=assets
+            DISCOURSE_HOSTNAME=${{ secrets.DISCOURSE_HOSTNAME }}
