@@ -55,6 +55,8 @@ services:
         sync: false
       - key: DISCOURSE_S3_ACCESS_KEY_ID
         value: minioadmin
+      - key: DISCOURSE_S3_BUCKET
+        value: assets
       - key: DISCOURSE_S3_SECRET_ACCESS_KEY
         fromService:
           type: web
