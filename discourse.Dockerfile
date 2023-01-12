@@ -88,4 +88,9 @@ ENV DISCOURSE_S3_BUCKET=$DISCOURSE_S3_BUCKET
 
 EXPOSE 80
 COPY discourse.start.sh /usr/bin/start.sh
+
+# Setup SSH for render
+# https://render.com/docs/ssh#limitations
+RUN mkdir ~/.ssh
+RUN chmod 0700 ~/.ssh
 CMD ["start.sh"]
