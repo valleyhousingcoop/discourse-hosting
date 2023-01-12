@@ -47,17 +47,14 @@ services:
           type: redis
           name: discourse-redis
           property: port
-      # - key: DISCOURSE_REDIS_PASSWORD
-      #   fromService:
-      #     type: redis
-      #     name: discourse-red
-      #     property: password
       - key: DISCOURSE_DEVELOPER_EMAILS
         sync: false
       - key: DISCOURSE_SMTP_DOMAIN
         sync: false
       - key: DISCOURSE_SMTP_PASSWORD
         sync: false
+      - key: DISCOURSE_S3_ACCESS_KEY_ID
+        value: minioadmin
       - key: DISCOURSE_S3_SECRET_ACCESS_KEY
         fromService:
           type: web
@@ -75,7 +72,7 @@ services:
     name: discourse-minio
     env: docker
     region: ohio
-    plan: starter
+    plan: standard
     dockerfilePath: minio.Dockerfile
     healthCheckPath: /minio/health/live
     buildFilter:

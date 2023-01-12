@@ -41,49 +41,50 @@ RUN  --mount=type=cache,target=/root/.yarn \
     YARN_CACHE_FOLDER=/root/.yarn \
     yarn install --production --frozen-lockfile
 ENV RAILS_ENV production
-# RUN bundle config build.rugged --use-system-libraries
 RUN bundle config --local without test development
-RUN bundle add mock_redis sqlite3
+RUN bundle add mock_redis sqlite3 debug
 COPY discourse.install-plugins.sh plugins.txt ./
 RUN ./discourse.install-plugins.sh
 RUN bundle exec rake plugin:install_all_gems
 RUN env LOAD_PLUGINS=0 bundle exec rake plugin:pull_compatible_all
-# RUN bundle exec rake themes:update
+
+
+ARG DISCOURSE_HOSTNAME
+ARG DISCOURSE_S3_BUCKET
+
+ENV DISCOURSE_HOSTNAME=$DISCOURSE_HOSTNAME
+ENV DISCOURSE_S3_CDN_URL=//$DISCOURSE_S3_BUCKET.$DISCOURSE_HOSTNAME
+
+# Mock DB and redis during assets precompilation
+COPY 003-mock-redis.rb /var/www/discourse/config/initializers/
+RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile
+RUN rm /var/www/discourse/config/initializers/003-mock-redis.rb
+
 
 
 ARG RENDER
 ARG DISCOURSE_HOSTNAME
 # Only use https s3 endpoint on render
 # https://stackoverflow.com/a/51264575/907060
-# if --build-arg RENDER=1, set NODE_ENV to 'development' or set to null otherwise.
 ENV protocol=${RENDER:+https}
 ENV protocol=${protocol:-http}
-
-ENV DISCOURSE_HOSTNAME=$DISCOURSE_HOSTNAME
 ENV DISCOURSE_S3_ENDPOINT=$protocol://$DISCOURSE_HOSTNAME
-ENV DISCOURSE_S3_CDN_URL=//assets.$DISCOURSE_HOSTNAME
-# Mock DB and redis during assets precompilation
-COPY 003-mock-redis.rb /var/www/discourse/config/initializers/
-RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile
-RUN rm /var/www/discourse/config/initializers/003-mock-redis.rb
 
-# Add this patch to allow looking at logs even without admin access, helpful for debugging
-# COPY auth_logs.diff /tmp/
-# RUN git apply /tmp/auth_logs.diff
+ENV UNICORN_BIND_ALL=1
+ENV UNICORN_WORKERS=2
+ENV UNICORN_PORT=80
+ENV UNICORN_SIDEKIQS=1
+ENV DISCOURSE_DISABLE_ANON_CACHE=1
+ENV DISCOURSE_SERVE_STATIC_ASSETS=true
+ENV DISCOURSE_SMTP_ADDRESS=smtp.sendgrid.net
+ENV DISCOURSE_SMTP_USER_NAME=apikey
+ENV DISCOURSE_SMTP_PORT=587
+ENV DISCOURSE_SMTP_ENABLE_START_TLS=true
+ENV DISCOURSE_USE_S3=true
+ENV DISCOURSE_S3_REGION=anything
+ENV DISCOURSE_S3_INSTALL_CORS_RULE=false
+ENV DISCOURSE_S3_BUCKET=$DISCOURSE_S3_BUCKET
 
-
-# Create a file so it looks like static assets have been compiled
-# RUN mkdir -p public/assets
-# RUN touch public/assets/application.js
-COPY discourse.start.sh /usr/bin/start.sh
-# COPY discourse.init.sh /usr/bin/init.sh
-# COPY discourse.entrypoint.sh /usr/bin/entrypoint.sh
-# ENTRYPOINT [ "/usr/bin/entrypoint.sh" ]
-# COPY 999-custom.rb /var/www/discourse/config/initializers/
-# COPY manifest.rake /var/www/discourse/lib/tasks/
 EXPOSE 80
-ENV UNICORN_BIND_ALL=1 UNICORN_WORKERS=2 UNICORN_PORT=80 UNICORN_SIDEKIQS=1
-ENV DISCOURSE_DISABLE_ANON_CACHE=1 DISCOURSE_SERVE_STATIC_ASSETS=true
-ENV DISCOURSE_SMTP_ADDRESS=smtp.sendgrid.net DISCOURSE_SMTP_USER_NAME=apikey DISCOURSE_SMTP_PORT=587 DISCOURSE_SMTP_ENABLE_START_TLS=true
-ENV DISCOURSE_USE_S3=true DISCOURSE_S3_REGION=anything DISCOURSE_S3_ACCESS_KEY_ID=minioadmin DISCOURSE_S3_BUCKET=assets DISCOURSE_S3_INSTALL_CORS_RULE=false
+COPY discourse.start.sh /usr/bin/start.sh
 CMD ["start.sh"]
