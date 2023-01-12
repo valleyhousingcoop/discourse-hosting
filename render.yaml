@@ -3,7 +3,7 @@ services:
     name: discourse
     env: docker
     region: ohio
-    plan: starter
+    plan: standard
     healthCheckPath: /srv/status
     dockerfilePath: discourse.Dockerfile
     buildFilter:
