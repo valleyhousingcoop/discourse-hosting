@@ -64,6 +64,10 @@ services:
           envVarKey: MINIO_ROOT_PASSWORD
       - key: DISCOURSE_NOTIFICATION_EMAIL
         sync: false
+      - key: DISCOURSE_FORCE_HTTPS
+        value: "true"
+      - key: EMAIL_ADDRESS
+        sync: false
   - type: redis
     name: discourse-redis
     ipAllowList: []
