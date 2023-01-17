@@ -35,7 +35,7 @@ RUN mkdir -p tmp/sockets log tmp/pids
 WORKDIR /var/www/discourse
 
 RUN git clone https://github.com/discourse/discourse.git /var/www/discourse
-RUN cd /var/www/discourse && git checkout 083ef4c8a1bf93ed5c4cba292d66ce3e09077f00
+RUN cd /var/www/discourse && git checkout 14983c5b8ed160ac6d0887f397982d0cf6597510
 
 RUN corepack enable
 RUN  --mount=type=cache,target=/root/.yarn \
