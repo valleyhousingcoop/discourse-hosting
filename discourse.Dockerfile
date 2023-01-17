@@ -34,8 +34,12 @@ RUN mkdir -p tmp/sockets log tmp/pids
 
 WORKDIR /var/www/discourse
 
-RUN git clone https://github.com/discourse/discourse.git /var/www/discourse
-RUN cd /var/www/discourse && git checkout 14983c5b8ed160ac6d0887f397982d0cf6597510
+# Only fetch one commit to reduce size
+# https://stackoverflow.com/a/43136160/907060
+RUN git clone https://github.com/discourse/discourse.git --depth 1 --branch tests-passed /var/www/discourse && \
+    cd /var/www/discourse && \
+    git fetch --depth 1 origin 14983c5b8ed160ac6d0887f397982d0cf6597510 && \
+    git checkout FETCH_HEAD
 
 RUN corepack enable
 RUN  --mount=type=cache,target=/root/.yarn \
