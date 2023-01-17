@@ -21,7 +21,6 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:latest
-          file: ./discourse.Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |

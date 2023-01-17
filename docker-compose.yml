@@ -21,7 +21,7 @@ services:
     image: discourse
     build:
       context: .
-      dockerfile: discourse.Dockerfile
+      dockerfile: Dockerfile
       args:
         - DISCOURSE_HOSTNAME=${HOSTNAME}
         - DISCOURSE_S3_CDN_URL=http://assets.${HOSTNAME}
