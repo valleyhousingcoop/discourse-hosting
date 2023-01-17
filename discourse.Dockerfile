@@ -84,10 +84,6 @@ ENV DISCOURSE_MAX_REQS_PER_IP_PER_10_SECONDS=1000
 ENV DISCOURSE_LOAD_MINI_PROFILER=false
 
 EXPOSE 80
-COPY discourse.start.sh /usr/bin/start.sh
+COPY discourse.init.sh /usr/bin/init.sh
 
-# Setup SSH for render
-# https://render.com/docs/ssh#limitations
-RUN mkdir ~/.ssh
-RUN chmod 0700 ~/.ssh
-CMD ["start.sh"]
+CMD ["bundle", "exec", "unicorn", "-c", "config/unicorn.conf.rb"]
