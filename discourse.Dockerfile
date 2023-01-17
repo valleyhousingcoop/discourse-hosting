@@ -55,22 +55,14 @@ RUN env LOAD_PLUGINS=0 bundle exec rake plugin:pull_compatible_all
 
 
 ARG DISCOURSE_HOSTNAME
-ARG DISCOURSE_S3_BUCKET
-ARG RENDER
-# Only use https s3 endpoint on render
-# https://stackoverflow.com/a/51264575/907060
-ENV protocol=${RENDER:+https}
-ENV protocol=${protocol:-http}
-
+ARG DISCOURSE_S3_CDN_URL
 ENV DISCOURSE_HOSTNAME=$DISCOURSE_HOSTNAME
-ENV DISCOURSE_S3_CDN_URL=$protocol://$DISCOURSE_S3_BUCKET.$DISCOURSE_HOSTNAME
+ENV DISCOURSE_S3_CDN_URL=$DISCOURSE_S3_CDN_URL
 
 # Mock DB and redis during assets precompilation
 COPY 003-mock-redis.rb /var/www/discourse/config/initializers/
 RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile
 RUN rm /var/www/discourse/config/initializers/003-mock-redis.rb
-
-
 
 
 ENV UNICORN_BIND_ALL=1
@@ -87,8 +79,6 @@ ENV DISCOURSE_SMTP_ENABLE_START_TLS=true
 ENV DISCOURSE_USE_S3=true
 ENV DISCOURSE_S3_REGION=anything
 ENV DISCOURSE_S3_INSTALL_CORS_RULE=false
-ENV DISCOURSE_S3_BUCKET=$DISCOURSE_S3_BUCKET
-ENV DISCOURSE_S3_ENDPOINT=$protocol://$DISCOURSE_HOSTNAME
 ENV DISCOURSE_MAX_REQS_PER_IP_MODE=none
 ENV DISCOURSE_MAX_REQS_PER_IP_PER_10_SECONDS=1000
 ENV DISCOURSE_LOAD_MINI_PROFILER=false

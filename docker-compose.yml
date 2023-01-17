@@ -24,7 +24,7 @@ services:
       dockerfile: discourse.Dockerfile
       args:
         - DISCOURSE_HOSTNAME=${HOSTNAME}
-        - DISCOURSE_S3_BUCKET=assets
+        - DISCOURSE_S3_CDN_URL=http://assets.${HOSTNAME}
     environment:
       - DISCOURSE_DB_HOST=db
       - DISCOURSE_DB_PORT=5432
@@ -40,6 +40,8 @@ services:
       - DISCOURSE_NOTIFICATION_EMAIL=${DISCOURSE_NOTIFICATION_EMAIL}
       - DISCOURSE_S3_ACCESS_KEY_ID=minioadmin
       - DISCOURSE_S3_SECRET_ACCESS_KEY=minioadmin
+      - DISCOURSE_S3_BUCKET=assets
+      - DISCOURSE_S3_ENDPOINT=http://${HOSTNAME}
     depends_on:
       - db
       - redis
