@@ -10,12 +10,12 @@ LABEL org.opencontainers.image.source="https://github.com/saulshanabrook/discour
 ENV LANG C.UTF-8
 
 # https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md#example-cache-apt-packages
-RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y jpegoptim optipng jhead nodejs pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev cmake pkg-config libgit2-dev libsqlite3-dev
-
+# RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+# RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    # --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y jpegoptim optipng jhead nodejs pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev cmake pkg-config libgit2-dev libsqlite3-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp/oxipng-install
 RUN wget https://github.com/shssoichiro/oxipng/releases/download/v5.0.1/oxipng-5.0.1-x86_64-unknown-linux-musl.tar.gz \
@@ -43,12 +43,10 @@ RUN git config --global http.sslVerify false && \
     git checkout FETCH_HEAD
 
 RUN corepack enable
-RUN  --mount=type=cache,target=/root/.yarn \
-    YARN_CACHE_FOLDER=/root/.yarn \
-    yarn install --production --frozen-lockfile
+RUN yarn install --production --frozen-lockfile && yarn cache clean
 ENV RAILS_ENV production
 RUN bundle config --local without test development
-RUN bundle add mock_redis sqlite3 debug
+RUN bundle add mock_redis sqlite3 debug --skip-install && bundler install --no-cache
 COPY discourse.install-plugins.sh plugins.txt ./
 RUN ./discourse.install-plugins.sh
 RUN bundle exec rake plugin:install_all_gems

@@ -1,6 +1,6 @@
 # discourse/discourse-adplugin
 # discourse/discourse-affiliate
-discourse/discourse-akismet
+# discourse/discourse-akismet
 # ArgumentError: Unknown migration version "7.0"; expected one of "4.2", "5.0", "5.1", "5.2", "6.0", "6.1"
 # discourse/discourse-algolia
 discourse/discourse-apple-auth
@@ -18,7 +18,7 @@ discourse/discourse-canned-replies
 discourse/discourse-categories-suppressed
 discourse/discourse-category-experts
 discourse/discourse-characters-required
-discourse/discourse-chat-integration
+# discourse/discourse-chat-integration
 discourse/discourse-checklist
 # Don't install code review bc problems install rugged deb library
 # discourse/discourse-code-review
@@ -35,7 +35,7 @@ discourse/discourse-graphviz
 discourse/discourse-invite-tokens
 # discourse/discourse-local-dates
 # discourse/discourse-login-with-amazon
-discourse/discourse-logster-rate-limit-checker
+# discourse/discourse-logster-rate-limit-checker
 discourse/discourse-logster-transporter
 # discourse/discourse-lti
 discourse/discourse-math
