@@ -36,7 +36,8 @@ WORKDIR /var/www/discourse
 
 # Only fetch one commit to reduce size
 # https://stackoverflow.com/a/43136160/907060
-RUN git clone https://github.com/discourse/discourse.git --depth 1 --branch tests-passed /var/www/discourse && \
+RUN git config --global http.sslVerify false && \
+    git clone https://github.com/discourse/discourse.git --depth 1 --branch tests-passed /var/www/discourse && \
     cd /var/www/discourse && \
     git fetch --depth 1 origin 14983c5b8ed160ac6d0887f397982d0cf6597510 && \
     git checkout FETCH_HEAD
