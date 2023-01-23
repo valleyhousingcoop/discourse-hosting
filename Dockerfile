@@ -81,8 +81,10 @@ ENV DISCOURSE_S3_INSTALL_CORS_RULE=false
 ENV DISCOURSE_MAX_REQS_PER_IP_MODE=none
 ENV DISCOURSE_MAX_REQS_PER_IP_PER_10_SECONDS=1000
 ENV DISCOURSE_LOAD_MINI_PROFILER=false
+ENV ENABLE_LOGRAGE=true
 
 EXPOSE 80
 COPY discourse.init.sh /usr/bin/init.sh
+RUN { echo 'stdout_path nil'; echo 'stderr_path nil'; } >> config/unicorn.conf.rb
 
 CMD ["bundle", "exec", "unicorn", "-c", "config/unicorn.conf.rb"]
