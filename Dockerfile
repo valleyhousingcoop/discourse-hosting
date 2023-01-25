@@ -83,6 +83,13 @@ ENV DISCOURSE_LOAD_MINI_PROFILER=false
 # Enable cloudflare assets to be loaded.
 ENV DISCOURSE_CONTENT_SECURITY_POLICY_SCRIPT_SRC=https://${DISCOURSE_HOSTNAME}/cdn-cgi/scripts/
 ENV ENABLE_LOGRAGE=true
+# https://meta.discourse.org/t/sidekiq-is-consuming-too-much-memory-restarting/48395/38?u=saulshanabrook
+ENV UNICORN_SIDEKIQ_MAX_RSS=1000
+# https://github.com/discourse/discourse_docker/blob/990519e2373ec32055a7742a407e81f4bd606ed4/templates/web.template.yml#L10-L12
+ENV RUBY_GLOBAL_METHOD_CACHE_SIZE=131072
+ENV RUBY_GC_HEAP_GROWTH_MAX_SLOTS=40000
+ENV RUBY_GC_HEAP_INIT_SLOTS=400000
+ENV RUBY_GC_HEAP_OLDOBJECT_LIMIT_FACTOR=1.5
 
 EXPOSE 3000
 COPY discourse.init.sh /usr/bin/init.sh
