@@ -39,7 +39,7 @@ WORKDIR /var/www/discourse
 RUN git config --global http.sslVerify false && \
     git clone https://github.com/discourse/discourse.git --depth 1 --branch tests-passed /var/www/discourse && \
     cd /var/www/discourse && \
-    git fetch --depth 1 origin 14983c5b8ed160ac6d0887f397982d0cf6597510 && \
+    git fetch --depth 1 origin e6a41150e24f3163d61d32f86834acae8098dead && \
     git checkout FETCH_HEAD
 
 RUN corepack enable
