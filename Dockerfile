@@ -60,8 +60,8 @@ ENV DISCOURSE_S3_CDN_URL=$DISCOURSE_S3_CDN_URL
 
 # Mock DB and redis during assets precompilation
 COPY 003-mock-redis.rb /var/www/discourse/config/initializers/
-RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile
-RUN rm /var/www/discourse/config/initializers/003-mock-redis.rb
+RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile && \
+    rm /var/www/discourse/config/initializers/003-mock-redis.rb
 
 
 ENV UNICORN_BIND_ALL=1
