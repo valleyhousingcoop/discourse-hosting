@@ -66,7 +66,6 @@ RUN rm /var/www/discourse/config/initializers/003-mock-redis.rb
 
 ENV UNICORN_BIND_ALL=1
 ENV UNICORN_WORKERS=2
-ENV UNICORN_PORT=80
 ENV UNICORN_SIDEKIQS=1
 ENV DISCOURSE_DISABLE_ANON_CACHE=1
 # Serve static assets since we aren't using nginx
@@ -85,7 +84,7 @@ ENV DISCOURSE_LOAD_MINI_PROFILER=false
 ENV DISCOURSE_CONTENT_SECURITY_POLICY_SCRIPT_SRC=https://${DISCOURSE_HOSTNAME}/cdn-cgi/scripts/
 ENV ENABLE_LOGRAGE=true
 
-EXPOSE 80
+EXPOSE 3000
 COPY discourse.init.sh /usr/bin/init.sh
 # Print logs to stdout/stderr instead of to a file.
 RUN { echo 'stdout_path nil'; echo 'stderr_path nil'; } >> config/unicorn.conf.rb
