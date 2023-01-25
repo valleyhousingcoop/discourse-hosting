@@ -14,7 +14,7 @@ ENV LANG C.UTF-8
 # RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     # --mount=type=cache,target=/var/lib/apt,sharing=locked \
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y jpegoptim optipng jhead nodejs pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev cmake pkg-config libgit2-dev libsqlite3-dev && \
+    apt-get install -y jpegoptim optipng jhead nodejs pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev cmake pkg-config libgit2-dev libsqlite3-dev postgresql-client && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp/oxipng-install
@@ -71,21 +71,23 @@ ENV UNICORN_SIDEKIQS=1
 ENV DISCOURSE_DISABLE_ANON_CACHE=1
 # Serve static assets since we aren't using nginx
 ENV DISCOURSE_SERVE_STATIC_ASSETS=true
-ENV DISCOURSE_SMTP_ADDRESS=smtp.sendgrid.net
-ENV DISCOURSE_SMTP_USER_NAME=apikey
-ENV DISCOURSE_SMTP_PORT=587
-ENV DISCOURSE_SMTP_ENABLE_START_TLS=true
+# ENV DISCOURSE_SMTP_ADDRESS=smtp.sendgrid.net
+# ENV DISCOURSE_SMTP_USER_NAME=apikey
+# ENV DISCOURSE_SMTP_PORT=587
+# ENV DISCOURSE_SMTP_ENABLE_START_TLS=true
 ENV DISCOURSE_USE_S3=true
 ENV DISCOURSE_S3_REGION=anything
 ENV DISCOURSE_S3_INSTALL_CORS_RULE=false
 ENV DISCOURSE_MAX_REQS_PER_IP_MODE=none
 ENV DISCOURSE_MAX_REQS_PER_IP_PER_10_SECONDS=1000
 ENV DISCOURSE_LOAD_MINI_PROFILER=false
+# Enable cloudflare assets to be loaded.
 ENV DISCOURSE_CONTENT_SECURITY_POLICY_SCRIPT_SRC=https://${DISCOURSE_HOSTNAME}/cdn-cgi/scripts/
 ENV ENABLE_LOGRAGE=true
 
 EXPOSE 80
 COPY discourse.init.sh /usr/bin/init.sh
+# Print logs to stdout/stderr instead of to a file.
 RUN { echo 'stdout_path nil'; echo 'stderr_path nil'; } >> config/unicorn.conf.rb
 
 CMD ["bundle", "exec", "unicorn", "-c", "config/unicorn.conf.rb"]
