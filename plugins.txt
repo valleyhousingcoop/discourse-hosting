@@ -1,5 +1,4 @@
 paviliondev/discourse-custom-wizard
-discourse/discourse-kanban-theme
 # discourse/discourse-adplugin
 # discourse/discourse-affiliate
 # discourse/discourse-akismet

@@ -52,7 +52,6 @@ RUN ./discourse.install-plugins.sh
 RUN bundle exec rake plugin:install_all_gems
 RUN env LOAD_PLUGINS=0 bundle exec rake plugin:pull_compatible_all
 
-
 ARG DISCOURSE_HOSTNAME
 ARG DISCOURSE_S3_CDN_URL
 ENV DISCOURSE_HOSTNAME=$DISCOURSE_HOSTNAME
