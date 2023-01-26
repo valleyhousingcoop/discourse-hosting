@@ -63,8 +63,8 @@ To import emails:
 
 ```shell
 mkdir -p data/import/emails
-mv some-mailbox.mbox data/import/emails
-dc run -v $PWD/data/import:/shared/import/data --rm web bundle exec ruby script/import_scripts/mbox.rb /var/www/discourse/script/import_scripts/mbox/settings.yml
+cp some-mailbox.mbox data/import/emails
+docker-compose run -v $PWD/data/import:/shared/import/data --rm web bundle exec ruby script/import_scripts/mbox.rb /var/www/discourse/script/import_scripts/mbox/settings.yml
 ```
 
 To remove all the data, run:
