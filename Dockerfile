@@ -95,4 +95,4 @@ COPY discourse.init.sh /usr/bin/init.sh
 # Print logs to stdout/stderr instead of to a file.
 RUN { echo 'stdout_path nil'; echo 'stderr_path nil'; } >> config/unicorn.conf.rb
 
-CMD ["init.sh"]
+CMD ["bundle", "exec", "unicorn", "-c", "config/unicorn.conf.rb"]
