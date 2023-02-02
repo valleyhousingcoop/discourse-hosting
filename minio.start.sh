@@ -3,14 +3,10 @@
 
 set -ex
 
-# https://veithen.io/2014/11/16/sigterm-propagation.html
-trap 'kill -TERM $PID' TERM INT
-
-export MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
-docker-entrypoint.sh server --address :80 --console-address :9001 /data &
+docker-entrypoint.sh server --address :80 /data &
 PID=$!
-until mc alias set local http://localhost minioadmin ${MINIO_ROOT_PASSWORD}; do
-    sleep 0.5;
+until mc alias set local http://localhost ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}; do
+    sleep 0.1;
 done;
 
 # Set bucket to allow downloads
@@ -19,4 +15,4 @@ done;
 mc mb --quiet local/assets/ || true
 mc mb --quiet local/backup/ || true
 mc anonymous set download local/assets;
-wait $PID
+kill $PID
