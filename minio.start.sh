@@ -17,5 +17,6 @@ done;
 # https://github.com/rishabhnambiar/discourse-docs/blob/master/minio.md#step-4-setting-an-upload-bucket-policy-skip-if-not-using-minio-for-image-uploads
 
 mc mb --quiet local/assets/ || true
+mc mb --quiet local/backup/ || true
 mc anonymous set download local/assets;
 wait $PID

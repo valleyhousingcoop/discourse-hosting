@@ -5,7 +5,7 @@ services:
       POSTGRES_PASSWORD: password
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
   redis:
@@ -16,7 +16,7 @@ services:
     environment:
         REDIS_ARGS: --requirepass password
     volumes:
-      - ./data/redis:/data
+      - redis:/data
   web:
     image: discourse
     build:
@@ -41,6 +41,8 @@ services:
       - DISCOURSE_S3_ACCESS_KEY_ID=minioadmin
       - DISCOURSE_S3_SECRET_ACCESS_KEY=minioadmin
       - DISCOURSE_S3_BUCKET=assets
+      - DISCOURSE_S3_BACKUP_BUCKET=backup
+      - DISCOURSE_BACKUP_LOCATION=s3
       - DISCOURSE_S3_ENDPOINT=http://${HOSTNAME}
     depends_on:
       - db
@@ -89,14 +91,18 @@ services:
     ports:
       - "9001:9001"
     volumes:
-      - ./data/minio:/data
+      - minio:/data
     environment:
       MINIO_DOMAIN: "${HOSTNAME:?err}"
     networks:
       default:
         aliases:
           - assets.${HOSTNAME:?err}
-          # - backup.${HOSTNAME:?err}
+          - backup.${HOSTNAME:?err}
 
 networks:
   default:
+volumes:
+  postgres:
+  redis:
+  minio:

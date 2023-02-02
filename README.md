@@ -45,7 +45,6 @@ Then run the following commands:
 
 
 ```shell
-mkdir -p data/{minio,redis,postgres}
 docker compose run --rm web init.sh
 docker compose up
 ```
