@@ -81,7 +81,7 @@ ENV DISCOURSE_MAX_REQS_PER_IP_PER_10_SECONDS=1000
 ENV DISCOURSE_LOAD_MINI_PROFILER=false
 # Enable cloudflare assets to be loaded.
 ENV DISCOURSE_CONTENT_SECURITY_POLICY_SCRIPT_SRC=https://${DISCOURSE_HOSTNAME}/cdn-cgi/scripts/
-ENV ENABLE_LOGRAGE=true
+# ENV ENABLE_LOGRAGE=true
 # https://meta.discourse.org/t/sidekiq-is-consuming-too-much-memory-restarting/48395/38?u=saulshanabrook
 ENV UNICORN_SIDEKIQ_MAX_RSS=1000
 # https://github.com/discourse/discourse_docker/blob/990519e2373ec32055a7742a407e81f4bd606ed4/templates/web.template.yml#L10-L12
