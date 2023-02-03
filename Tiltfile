@@ -6,3 +6,11 @@ web_service['command'] = 'init.sh'
 
 docker_compose(["./docker-compose.yml", encode_yaml({"services": {"init": web_service}})])
 dc_resource("init", trigger_mode=TRIGGER_MODE_MANUAL)
+
+load('ext://dotenv', 'dotenv')
+dotenv()
+
+hostname = os.getenv('HOSTNAME')
+
+
+dc_resource("web", links=[link(hostname, "home"), link(hostname + "/logs", "logs")])

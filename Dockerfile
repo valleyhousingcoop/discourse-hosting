@@ -39,7 +39,7 @@ WORKDIR /var/www/discourse
 RUN git config --global http.sslVerify false && \
     git clone https://github.com/discourse/discourse.git --depth 1 --branch tests-passed /var/www/discourse && \
     cd /var/www/discourse && \
-    git fetch --depth 1 origin e6a41150e24f3163d61d32f86834acae8098dead && \
+    git fetch --depth 1 origin 651476e89e9c00aa7368553fb73c5df64b18ee6e && \
     git checkout FETCH_HEAD
 
 RUN corepack enable
@@ -89,10 +89,12 @@ ENV RUBY_GLOBAL_METHOD_CACHE_SIZE=131072
 ENV RUBY_GC_HEAP_GROWTH_MAX_SLOTS=40000
 ENV RUBY_GC_HEAP_INIT_SLOTS=400000
 ENV RUBY_GC_HEAP_OLDOBJECT_LIMIT_FACTOR=1.5
+ENV DISCOURSE_FORCE_HTTPS=true
 
 EXPOSE 3000
 COPY discourse.init.sh /usr/bin/init.sh
 # Print logs to stdout/stderr instead of to a file.
-RUN { echo 'stdout_path nil'; echo 'stderr_path nil'; } >> config/unicorn.conf.rb
+RUN { echo 'stdout_path nil'; echo 'stderr_path nil'; echo 'logger Logger.new(STDOUT)'; } >> config/unicorn.conf.rb
+COPY 999-log-stdout.rb /var/www/discourse/config/initializers/
 
 CMD ["bundle", "exec", "unicorn", "-c", "config/unicorn.conf.rb"]

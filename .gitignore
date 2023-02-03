@@ -1,3 +1,4 @@
 .env
 data
 *.code-workspace
+cloudflare.ini

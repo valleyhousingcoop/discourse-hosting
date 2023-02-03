@@ -18,13 +18,12 @@ services:
     volumes:
       - redis:/data
   web:
-    image: discourse
     build:
       context: .
       dockerfile: Dockerfile
       args:
         - DISCOURSE_HOSTNAME=${HOSTNAME}
-        - DISCOURSE_S3_CDN_URL=http://assets.${HOSTNAME}
+        - DISCOURSE_S3_CDN_URL=https://assets.${HOSTNAME}
     environment:
       - DISCOURSE_DB_HOST=db
       - DISCOURSE_DB_PORT=5432
@@ -34,9 +33,9 @@ services:
       - DISCOURSE_REDIS_HOST=redis
       - DISCOURSE_REDIS_PASSWORD=password
       - DISCOURSE_DEVELOPER_EMAILS=${EMAIL}
-      - DISCOURSE_SMTP_DOMAIN=${EMAIL_DOMAIN}
+      - DISCOURSE_SMTP_DOMAIN=${HOSTNAME}
       - DISCOURSE_SMTP_PASSWORD=${SEND_GRID_API_KEY}
-      - DISCOURSE_NOTIFICATION_EMAIL=${DISCOURSE_NOTIFICATION_EMAIL}
+      - DISCOURSE_NOTIFICATION_EMAIL=notify@${HOSTNAME}
       - DISCOURSE_S3_ACCESS_KEY_ID=minioadmin
       - DISCOURSE_S3_SECRET_ACCESS_KEY=minioadmin
       - DISCOURSE_S3_BUCKET=assets
@@ -49,40 +48,21 @@ services:
       - minio
   # Reverse proxy to differentiate based on domain, which server to use
   nginx:
-    image: nginx:latest
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
     ports:
       - 80:80
-    entrypoint:
-      - bash
-      - "-c"
-      - >
-        set -ex &&
-        echo '
-        events {
-
-        }
-        http {
-          server {
-              listen 80;
-              server_name assets.${HOSTNAME:?err};
-              location / {
-                  proxy_set_header Host $$http_host;
-                  proxy_pass http://minio;
-              }
-          }
-          server {
-              listen 80;
-              server_name ${HOSTNAME:?err};
-              location / {
-                  proxy_set_header Host $$http_host;
-                  proxy_pass http://web:3000;
-              }
-          }
-        }' > /etc/nginx/nginx.conf &&
-        nginx -g 'daemon off;'
+      - 443:443
+    environment:
+       - HOSTNAME=${HOSTNAME}
+       - CERTBOT_EMAIL=${EMAIL}
+       - CERTBOT_DNS_PROPAGATION_SECONDS=60
     depends_on:
       - web
       - minio
+    volumes:
+      - letsencrypt:/etc/letsencrypt
   minio:
     build:
       context: .
@@ -105,3 +85,4 @@ volumes:
   postgres:
   redis:
   minio:
+  letsencrypt:

@@ -112,17 +112,3 @@ ActionController::Base.helpers.asset_path("vendor.js")
 
 We run the sidekiq alongside the web process in the same container. This is so that they can share a mounted volume [in Render](https://render.com/docs/disks) which cannot be shared accross containers. Alternatively,
 we could set everything up to use a third party service like S3 for uploads and assets.
-
-
-TODO: Add two rake tasks, one to upload manifest, the other to download manifest
-* https://github.com/rails/sprockets-rails/issues/107#issuecomment-34535325
-* Upload it just as one filename.
-* https://github.com/rails/sprockets/blob/1276b431e2e4c1099dae1b3ff76adc868c863ddd/lib/sprockets/manifest_utils.rb#L10
-
-* Actually just create an initializer that does this. If there is no manifest file, download it. If there is one,
-  and its ID is not 00000000000000000000000000000000, then upload it.
-
-This way it will only be downloaded if it hasn't been already.
-
-Like this file `/var/www/discourse/public/assets/.sprockets-manifest-c1adc4e851d160658421ecf1ba8e8d55.json`
-
