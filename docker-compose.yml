@@ -1,6 +1,42 @@
+x-glitchtip-environment:
+  &glitchtip-environment
+  DATABASE_URL: postgres://postgres:password@db:5432/glitchtip
+  SECRET_KEY: ${SECRET_KEY}
+  PORT: 8000
+  EMAIL_BACKEND: anymail.backends.sendgrid.EmailBackend
+  SENDGRID_API_KEY: ${SEND_GRID_API_KEY}
+  GLITCHTIP_DOMAIN: https://glitchtip.${HOSTNAME}
+  DEFAULT_FROM_EMAIL: glitchtip@${HOSTNAME}
+  REDIS_HOST: redis
+  REDIS_PASSWORD: password
+x-glitchtip-depends_on:
+  &glitchtip-depends_on
+  - db
+  - redis
+
 services:
+  glitchtip-web:
+    image: glitchtip/glitchtip
+    depends_on: *glitchtip-depends_on
+    ports:
+      - "8000"
+    environment: *glitchtip-environment
+    restart: unless-stopped
+  glitchtip-worker:
+    image: glitchtip/glitchtip
+    command: ./bin/run-celery-with-beat.sh
+    depends_on: *glitchtip-depends_on
+    environment: *glitchtip-environment
+    restart: unless-stopped
+  glitchtip-migrate:
+    image: glitchtip/glitchtip
+    depends_on: *glitchtip-depends_on
+    command: "./manage.py migrate"
+    environment: *glitchtip-environment
   db:
-    image: postgres
+    build:
+      context: .
+      dockerfile: db.Dockerfile
     environment:
       POSTGRES_PASSWORD: password
       PGDATA: /var/lib/postgresql/data/pgdata
@@ -42,6 +78,7 @@ services:
       - DISCOURSE_S3_BACKUP_BUCKET=backup
       - DISCOURSE_BACKUP_LOCATION=s3
       - DISCOURSE_S3_ENDPOINT=http://${HOSTNAME}
+      - SENTRY_DSN=${DSN}
     depends_on:
       - db
       - redis

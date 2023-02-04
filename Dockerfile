@@ -39,18 +39,21 @@ WORKDIR /var/www/discourse
 RUN git config --global http.sslVerify false && \
     git clone https://github.com/discourse/discourse.git --depth 1 --branch tests-passed /var/www/discourse && \
     cd /var/www/discourse && \
-    git fetch --depth 1 origin 651476e89e9c00aa7368553fb73c5df64b18ee6e && \
+    git fetch --depth 1 origin e6a41150e24f3163d61d32f86834acae8098dead && \
     git checkout FETCH_HEAD
+
 
 RUN corepack enable
 RUN yarn install --production --frozen-lockfile && yarn cache clean
 ENV RAILS_ENV production
 RUN bundle config --local without test development
-RUN bundle add mock_redis sqlite3 debug --skip-install && bundler install --no-cache
+RUN bundle add mock_redis sqlite3 debug sentry-ruby sentry-rails sentry-sidekiq --skip-install && bundler install --no-cache
 COPY discourse.install-plugins.sh plugins.txt ./
 RUN ./discourse.install-plugins.sh
 RUN bundle exec rake plugin:install_all_gems
 RUN env LOAD_PLUGINS=0 bundle exec rake plugin:pull_compatible_all
+
+
 
 ARG DISCOURSE_HOSTNAME
 ARG DISCOURSE_S3_CDN_URL
@@ -96,5 +99,9 @@ COPY discourse.init.sh /usr/bin/init.sh
 # Print logs to stdout/stderr instead of to a file.
 RUN { echo 'stdout_path nil'; echo 'stderr_path nil'; echo 'logger Logger.new(STDOUT)'; } >> config/unicorn.conf.rb
 COPY 999-log-stdout.rb /var/www/discourse/config/initializers/
+COPY 999-glitchtip.rb /var/www/discourse/config/initializers/
+# Copy error handling to sikekiq so its loaded then
+# RUN cat /var/www/discourse/config/initializers/999-glitchtip.rb >> /var/www/discourse/config/initializers/100-sidekiq.rb
 
 CMD ["bundle", "exec", "unicorn", "-c", "config/unicorn.conf.rb"]
+

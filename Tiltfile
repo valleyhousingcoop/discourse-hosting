@@ -6,6 +6,7 @@ web_service['command'] = 'init.sh'
 
 docker_compose(["./docker-compose.yml", encode_yaml({"services": {"init": web_service}})])
 dc_resource("init", trigger_mode=TRIGGER_MODE_MANUAL)
+dc_resource("glitchtip-migrate", trigger_mode=TRIGGER_MODE_MANUAL)
 
 load('ext://dotenv', 'dotenv')
 dotenv()
