@@ -1,39 +1,58 @@
-x-glitchtip-environment:
-  &glitchtip-environment
-  DATABASE_URL: postgres://postgres:password@db:5432/glitchtip
-  SECRET_KEY: ${SECRET_KEY}
-  PORT: 8000
-  EMAIL_BACKEND: anymail.backends.sendgrid.EmailBackend
-  SENDGRID_API_KEY: ${SEND_GRID_API_KEY}
-  GLITCHTIP_DOMAIN: https://glitchtip.${HOSTNAME}
-  DEFAULT_FROM_EMAIL: glitchtip@${HOSTNAME}
-  REDIS_HOST: redis
-  REDIS_PASSWORD: password
-x-glitchtip-depends_on:
-  &glitchtip-depends_on
-  - db
-  - redis
+x-glitchtip:
+  &glitchtip
+  image: glitchtip/glitchtip
+  environment:
+    DATABASE_URL: postgres://postgres:password@db:5432/glitchtip
+    SECRET_KEY: ${SECRET_KEY}
+    PORT: 80
+    EMAIL_BACKEND: anymail.backends.sendgrid.EmailBackend
+    SENDGRID_API_KEY: ${SEND_GRID_API_KEY}
+    GLITCHTIP_DOMAIN: https://glitchtip.${HOSTNAME}
+    DEFAULT_FROM_EMAIL: glitchtip@${HOSTNAME}
+    REDIS_HOST: redis
+    REDIS_PASSWORD: password
+  depends_on:
+    - db
+    - redis
+
+x-discourse:
+  &discourse
+  build:
+    context: .
+    dockerfile: Dockerfile
+    args:
+      - DISCOURSE_HOSTNAME=${HOSTNAME}
+      - DISCOURSE_S3_CDN_URL=https://assets.${HOSTNAME}
+  env_file:
+    - .env
+    - discourse.env
+  environment:
+    - SENTRY_DSN=${DSN}
+  depends_on:
+    - db
+    - redis
+    - minio
+    - glitchtip-web
 
 services:
   glitchtip-web:
-    image: glitchtip/glitchtip
-    depends_on: *glitchtip-depends_on
+    <<: *glitchtip
     ports:
-      - "8000"
-    environment: *glitchtip-environment
-    restart: unless-stopped
+      - "80"
+    restart: always
+    networks:
+      default:
+        aliases:
+          - glitchtip.${HOSTNAME}
   glitchtip-worker:
-    image: glitchtip/glitchtip
+    <<: *glitchtip
     command: ./bin/run-celery-with-beat.sh
-    depends_on: *glitchtip-depends_on
-    environment: *glitchtip-environment
-    restart: unless-stopped
+    restart: always
   glitchtip-migrate:
-    image: glitchtip/glitchtip
-    depends_on: *glitchtip-depends_on
+    <<: *glitchtip
     command: "./manage.py migrate"
-    environment: *glitchtip-environment
   db:
+    restart: always
     build:
       context: .
       dockerfile: db.Dockerfile
@@ -45,6 +64,7 @@ services:
     ports:
       - "5432:5432"
   redis:
+    restart: always
     image: redis/redis-stack:latest
     ports:
       - "8001:8001"
@@ -54,37 +74,21 @@ services:
     volumes:
       - redis:/data
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        - DISCOURSE_HOSTNAME=${HOSTNAME}
-        - DISCOURSE_S3_CDN_URL=https://assets.${HOSTNAME}
-    environment:
-      - DISCOURSE_DB_HOST=db
-      - DISCOURSE_DB_PORT=5432
-      - DISCOURSE_DB_NAME=postgres
-      - DISCOURSE_DB_USERNAME=postgres
-      - DISCOURSE_DB_PASSWORD=password
-      - DISCOURSE_REDIS_HOST=redis
-      - DISCOURSE_REDIS_PASSWORD=password
-      - DISCOURSE_DEVELOPER_EMAILS=${EMAIL}
-      - DISCOURSE_SMTP_DOMAIN=${HOSTNAME}
-      - DISCOURSE_SMTP_PASSWORD=${SEND_GRID_API_KEY}
-      - DISCOURSE_NOTIFICATION_EMAIL=notify@${HOSTNAME}
-      - DISCOURSE_S3_ACCESS_KEY_ID=minioadmin
-      - DISCOURSE_S3_SECRET_ACCESS_KEY=minioadmin
-      - DISCOURSE_S3_BUCKET=assets
-      - DISCOURSE_S3_BACKUP_BUCKET=backup
-      - DISCOURSE_BACKUP_LOCATION=s3
-      - DISCOURSE_S3_ENDPOINT=http://${HOSTNAME}
-      - SENTRY_DSN=${DSN}
-    depends_on:
-      - db
-      - redis
-      - minio
-  # Reverse proxy to differentiate based on domain, which server to use
+    <<: *discourse
+    restart: always
+  migrate:
+    <<: *discourse
+    command: bundle exec rake --trace db:migrate
+  upload_assets:
+    <<: *discourse
+    command: bundle exec rake --trace s3:upload_assets
+  install_themes:
+    <<: *discourse
+    command: |
+      bundle exec rake --trace themes:install -- '--{"discourse-kanban-theme": "https://github.com/discourse/discourse-kanban-theme"}'
+
   nginx:
+    restart: always
     build:
       context: .
       dockerfile: nginx.Dockerfile
@@ -101,6 +105,7 @@ services:
     volumes:
       - letsencrypt:/etc/letsencrypt
   minio:
+    restart: always
     build:
       context: .
       dockerfile: minio.Dockerfile

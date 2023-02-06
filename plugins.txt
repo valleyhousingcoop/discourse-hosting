@@ -1,4 +1,3 @@
-debtcollective/discourse-sentry
 paviliondev/discourse-custom-wizard
 # discourse/discourse-adplugin
 # discourse/discourse-affiliate

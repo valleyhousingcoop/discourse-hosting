@@ -47,7 +47,9 @@ RUN corepack enable
 RUN yarn install --production --frozen-lockfile && yarn cache clean
 ENV RAILS_ENV production
 RUN bundle config --local without test development
-RUN bundle add mock_redis sqlite3 debug sentry-ruby sentry-rails sentry-sidekiq --skip-install && bundler install --no-cache
+RUN bundle add sentry-ruby --skip-install --version '>=5.8.0' && \
+    bundle add mock_redis sqlite3 debug sentry-rails sentry-sidekiq --skip-install && \
+    bundler install --no-cache
 COPY discourse.install-plugins.sh plugins.txt ./
 RUN ./discourse.install-plugins.sh
 RUN bundle exec rake plugin:install_all_gems
@@ -66,40 +68,12 @@ RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile && \
     rm /var/www/discourse/config/initializers/003-mock-redis.rb
 
 
-ENV UNICORN_BIND_ALL=1
-ENV UNICORN_WORKERS=2
-ENV UNICORN_SIDEKIQS=1
-ENV DISCOURSE_DISABLE_ANON_CACHE=1
-# Serve static assets since we aren't using nginx
-ENV DISCOURSE_SERVE_STATIC_ASSETS=true
-# ENV DISCOURSE_SMTP_ADDRESS=smtp.sendgrid.net
-# ENV DISCOURSE_SMTP_USER_NAME=apikey
-# ENV DISCOURSE_SMTP_PORT=587
-# ENV DISCOURSE_SMTP_ENABLE_START_TLS=true
-ENV DISCOURSE_USE_S3=true
-ENV DISCOURSE_S3_REGION=anything
-ENV DISCOURSE_S3_INSTALL_CORS_RULE=false
-ENV DISCOURSE_MAX_REQS_PER_IP_MODE=none
-ENV DISCOURSE_MAX_REQS_PER_IP_PER_10_SECONDS=1000
-ENV DISCOURSE_LOAD_MINI_PROFILER=false
-# Enable cloudflare assets to be loaded.
-ENV DISCOURSE_CONTENT_SECURITY_POLICY_SCRIPT_SRC=https://${DISCOURSE_HOSTNAME}/cdn-cgi/scripts/
-# ENV ENABLE_LOGRAGE=true
-# https://meta.discourse.org/t/sidekiq-is-consuming-too-much-memory-restarting/48395/38?u=saulshanabrook
-ENV UNICORN_SIDEKIQ_MAX_RSS=1000
-# https://github.com/discourse/discourse_docker/blob/990519e2373ec32055a7742a407e81f4bd606ed4/templates/web.template.yml#L10-L12
-ENV RUBY_GLOBAL_METHOD_CACHE_SIZE=131072
-ENV RUBY_GC_HEAP_GROWTH_MAX_SLOTS=40000
-ENV RUBY_GC_HEAP_INIT_SLOTS=400000
-ENV RUBY_GC_HEAP_OLDOBJECT_LIMIT_FACTOR=1.5
-ENV DISCOURSE_FORCE_HTTPS=true
-
 EXPOSE 3000
 COPY discourse.init.sh /usr/bin/init.sh
 # Print logs to stdout/stderr instead of to a file.
 RUN { echo 'stdout_path nil'; echo 'stderr_path nil'; echo 'logger Logger.new(STDOUT)'; } >> config/unicorn.conf.rb
 COPY 999-log-stdout.rb /var/www/discourse/config/initializers/
-COPY 999-glitchtip.rb /var/www/discourse/config/initializers/
+COPY 000-glitchtip.rb /var/www/discourse/config/initializers/
 # Copy error handling to sikekiq so its loaded then
 # RUN cat /var/www/discourse/config/initializers/999-glitchtip.rb >> /var/www/discourse/config/initializers/100-sidekiq.rb
 
