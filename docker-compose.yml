@@ -92,6 +92,8 @@ services:
     build:
       context: .
       dockerfile: nginx.Dockerfile
+      args:
+        - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
     ports:
       - 80:80
       - 443:443
@@ -120,6 +122,15 @@ services:
         aliases:
           - assets.${HOSTNAME:?err}
           - backup.${HOSTNAME:?err}
+  ddclient:
+    restart: always
+    build:
+      context: .
+      dockerfile: ddclient.Dockerfile
+      args:
+        - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+        - HOSTNAME=${HOSTNAME}
+        - CLOUDFLARE_ZONE=${CLOUDFLARE_ZONE}
 
 networks:
   default:
