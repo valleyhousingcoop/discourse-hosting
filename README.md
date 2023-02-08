@@ -38,7 +38,7 @@ docker compose run --rm glitchtip-migrate
 docker compose run --rm migrate
 docker compose run --rm upload_assets
 docker compose run --rm install_themes
-docker compose up
+docker compose up web glitchtip-worker
 ```
 
 
