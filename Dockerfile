@@ -73,9 +73,12 @@ COPY discourse.init.sh /usr/bin/init.sh
 # Print logs to stdout/stderr instead of to a file.
 RUN { echo 'stdout_path nil'; echo 'stderr_path nil'; echo 'logger Logger.new(STDOUT)'; } >> config/unicorn.conf.rb
 COPY 999-log-stdout.rb /var/www/discourse/config/initializers/
+# Apply sidekiq_logging.diff patch so that sidekiq logs to stdout
+# COPY sidekiq_logging.diff /var/www/discourse/
+# RUN cd /var/www/discourse && patch -p1 < sidekiq_logging.diff
 COPY 000-glitchtip.rb /var/www/discourse/config/initializers/
 # Copy error handling to sikekiq so its loaded then
-# RUN cat /var/www/discourse/config/initializers/999-glitchtip.rb >> /var/www/discourse/config/initializers/100-sidekiq.rb
+# RUN cat /var/www/discourse/config/initializers/999-log-stdout.rb >> /var/www/discourse/config/initializers/100-sidekiq.rb
 
 CMD ["bundle", "exec", "unicorn", "-c", "config/unicorn.conf.rb"]
 
