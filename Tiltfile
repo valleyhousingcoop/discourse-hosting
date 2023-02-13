@@ -11,6 +11,5 @@ dotenv()
 
 hostname = os.getenv('HOSTNAME')
 
-
 dc_resource("web", links=[link(hostname, "home"), link(hostname + "/logs", "logs")])
 dc_resource("glitchtip-web", links=[link("glitchtip." + hostname, "Glitchtip")])

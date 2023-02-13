@@ -80,5 +80,9 @@ COPY 000-glitchtip.rb /var/www/discourse/config/initializers/
 # Copy error handling to sikekiq so its loaded then
 # RUN cat /var/www/discourse/config/initializers/999-log-stdout.rb >> /var/www/discourse/config/initializers/100-sidekiq.rb
 
+# Replace `klass.class_eval patches` with `return` in lib/method_profiler.rb to support sentry
+# https://github.com/getsentry/sentry-ruby/issues/1999
+RUN sed -i 's/klass.class_eval patches/return/' /var/www/discourse/lib/method_profiler.rb
+
 CMD ["bundle", "exec", "unicorn", "-c", "config/unicorn.conf.rb"]
 
