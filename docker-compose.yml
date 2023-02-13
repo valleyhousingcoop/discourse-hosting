@@ -40,10 +40,6 @@ services:
     ports:
       - "80"
     restart: always
-    networks:
-      default:
-        aliases:
-          - glitchtip.${HOSTNAME}
   glitchtip-worker:
     <<: *glitchtip
     command: ./bin/run-celery-with-beat.sh
@@ -106,6 +102,12 @@ services:
       - minio
     volumes:
       - letsencrypt:/etc/letsencrypt
+    networks:
+      default:
+        aliases:
+          - assets.${HOSTNAME:?err}
+          - backup.${HOSTNAME:?err}
+          - glitchtip.${HOSTNAME:?err}
   minio:
     restart: always
     build:
@@ -117,11 +119,6 @@ services:
       - minio:/data
     environment:
       MINIO_DOMAIN: "${HOSTNAME:?err}"
-    networks:
-      default:
-        aliases:
-          - assets.${HOSTNAME:?err}
-          - backup.${HOSTNAME:?err}
   ddclient:
     restart: always
     build:
