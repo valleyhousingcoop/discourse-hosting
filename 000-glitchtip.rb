@@ -2,6 +2,9 @@ Sentry.init do |config|
   config.breadcrumbs_logger = [:sentry_logger, :active_support_logger, :http_logger]
   config.include_local_variables = true
   config.send_default_pii = true
+  # Disable session tracking since not supported by glitchtip
+  # https://gitlab.com/glitchtip/glitchtip-backend/-/issues/206
+  config.auto_session_tracking = false
 end
 
 
