@@ -108,6 +108,7 @@ services:
           - assets.${HOSTNAME:?err}
           - backup.${HOSTNAME:?err}
           - glitchtip.${HOSTNAME:?err}
+          - ${HOSTNAME:?err}
   minio:
     restart: always
     build:
@@ -128,7 +129,29 @@ services:
         - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
         - HOSTNAME=${HOSTNAME}
         - CLOUDFLARE_ZONE=${CLOUDFLARE_ZONE}
-
+  mail-reciever:
+    image: discourse/mail-receiver:release
+    restart: always
+    ports:
+      - "25:25"
+    volumes:
+      - postfix:/var/spool/postfix
+    environment:
+      - MAIL_DOMAIN=${HOSTNAME}
+      - DISCOURSE_API_KEY=${DISCOURSE_API_KEY}
+      - DISCOURSE_BASE_URL=https://${HOSTNAME}
+      - DISCOURSE_API_USERNAME=system
+    depends_on:
+      - nginx
+  test-email:
+    build:
+      context: .
+      dockerfile: test-email.Dockerfile
+    environment:
+      - FROM_ADDRESS=${EMAIL}
+      - TO_ADDRESS=${TEST_EMAIL_ADDRESS}
+    depends_on:
+      - mail-reciever
 networks:
   default:
 volumes:
@@ -136,3 +159,4 @@ volumes:
   redis:
   minio:
   letsencrypt:
+  postfix:
