@@ -32,7 +32,6 @@ RUN gem install bundler --no-document -v '2.3.22'
 WORKDIR /home/discourse/discourse
 RUN mkdir -p tmp/sockets log tmp/pids
 
-WORKDIR /var/www/discourse
 
 # Only fetch one commit to reduce size
 # https://stackoverflow.com/a/43136160/907060
@@ -41,6 +40,8 @@ RUN git config --global http.sslVerify false && \
     cd /var/www/discourse && \
     git fetch --depth 1 origin e6a41150e24f3163d61d32f86834acae8098dead && \
     git checkout FETCH_HEAD
+
+WORKDIR /var/www/discourse
 
 
 RUN corepack enable
@@ -63,20 +64,17 @@ ENV DISCOURSE_HOSTNAME=$DISCOURSE_HOSTNAME
 ENV DISCOURSE_S3_CDN_URL=$DISCOURSE_S3_CDN_URL
 
 # Mock DB and redis during assets precompilation
-COPY 003-mock-redis.rb /var/www/discourse/config/initializers/
+COPY 003-mock-redis.rb ./config/initializers/
 RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile && \
-    rm /var/www/discourse/config/initializers/003-mock-redis.rb
+    rm ./config/initializers/003-mock-redis.rb
 
 
 EXPOSE 3000
-COPY discourse.init.sh /usr/bin/init.sh
 # Print logs to stdout/stderr instead of to a file.
 RUN { echo 'stdout_path nil'; echo 'stderr_path nil'; echo 'logger Logger.new(STDOUT)'; } >> config/unicorn.conf.rb
-COPY 999-log-stdout.rb /var/www/discourse/config/initializers/
-# Apply sidekiq_logging.diff patch so that sidekiq logs to stdout
-# COPY sidekiq_logging.diff /var/www/discourse/
-# RUN cd /var/www/discourse && patch -p1 < sidekiq_logging.diff
-COPY 000-glitchtip.rb /var/www/discourse/config/initializers/
+COPY 999-log-stdout.rb 000-glitchtip.rb ./config/initializers/
+COPY discourse.run.sh ./
+
 # Copy error handling to sikekiq so its loaded then
 # RUN cat /var/www/discourse/config/initializers/999-log-stdout.rb >> /var/www/discourse/config/initializers/100-sidekiq.rb
 
@@ -84,5 +82,5 @@ COPY 000-glitchtip.rb /var/www/discourse/config/initializers/
 # https://github.com/getsentry/sentry-ruby/issues/1999
 RUN sed -i 's/klass.class_eval patches/return/' /var/www/discourse/lib/method_profiler.rb
 
-CMD ["bundle", "exec", "unicorn", "-c", "config/unicorn.conf.rb"]
+CMD ["./discourse.run.sh"]
 
