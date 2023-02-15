@@ -100,6 +100,14 @@ helper.preload_script("vendor")
 ActionController::Base.helpers.asset_path("vendor.js")
 ```
 
+## Ruby Debugger
+
+We also include the `debug` gem, which you can invoke to start a bundle command with debugging:
+
+```bash
+docker compose run --rm upload_assets rdbg -c --  bundle exec rake s3:upload_assets
+```
+
 ## About
 
 We run the sidekiq alongside the web process in the same container. This is so that they can share a mounted volume [in Render](https://render.com/docs/disks) which cannot be shared accross containers. Alternatively,
