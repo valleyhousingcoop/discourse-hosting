@@ -15,8 +15,10 @@ dc_resource("web", links=[link(hostname, "home"), link(hostname + "/logs", "logs
 dc_resource("glitchtip-web", links=[link("glitchtip." + hostname, "Glitchtip")])
 
 
-# If the user is not the production user, disable the ddclient service
-user = os.getenv("USER")
-production_user = os.getenv("PRODUCTION_USER")
-if user != production_user:
+# If we are not in the production docker context, disable ddclient
+current_context = str(local("docker context inspect -f '{{.Name}}'", quiet=True)).strip()
+production_context = os.getenv("PRODUCTION_CONTEXT")
+in_production = current_context == production_context
+print("In production: " + str(in_production))
+if not in_production:
     dc_resource("ddclient", trigger_mode=TRIGGER_MODE_MANUAL, auto_init=False)
