@@ -106,7 +106,6 @@ services:
       default:
         aliases:
           - assets.${HOSTNAME:?err}
-          - backup.${HOSTNAME:?err}
           - glitchtip.${HOSTNAME:?err}
           - ${HOSTNAME:?err}
   minio:
@@ -119,7 +118,12 @@ services:
     volumes:
       - minio:/data
     environment:
-      MINIO_DOMAIN: "${HOSTNAME:?err}"
+      MINIO_DOMAIN: minio
+    networks:
+      default:
+        aliases:
+          - assets.minio
+          - backup.minio
   ddclient:
     restart: always
     build:
