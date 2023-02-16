@@ -1,3 +1,4 @@
+paviliondev/discourse-events
 paviliondev/discourse-custom-wizard
 # discourse/discourse-adplugin
 # discourse/discourse-affiliate
@@ -14,7 +15,7 @@ discourse/discourse-auto-deactivate
 #     at _discourse-cakeday-f1cb65ed4faa4049ccafdb0223fd092f58da582df5110decf352107f9e420c3d.js:593:15
 #    at _discourse-cakeday-f1cb65ed4faa4049ccafdb0223fd092f58da582df5110decf352107f9e420c3d.js:633:16
 # discourse/discourse-cakeday
-discourse/discourse-calendar
+# discourse/discourse-calendar
 discourse/discourse-canned-replies
 discourse/discourse-categories-suppressed
 discourse/discourse-category-experts
