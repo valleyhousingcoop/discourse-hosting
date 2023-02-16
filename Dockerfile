@@ -9,12 +9,24 @@ LABEL org.opencontainers.image.source="https://github.com/saulshanabrook/discour
 
 ENV LANG C.UTF-8
 
-# https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md#example-cache-apt-packages
-# RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
-# RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    # --mount=type=cache,target=/var/lib/apt,sharing=locked \
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y jpegoptim optipng jhead nodejs pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev cmake pkg-config libgit2-dev libsqlite3-dev postgresql-client && \
+
+# Hard code version codename to remove need for lsb_release
+ENV VERSION_CODENAME=bullseye
+# Verify version codename
+RUN cat /etc/os-release | grep VERSION_CODENAME=$VERSION_CODENAME
+
+
+ENV KEYRINGS=/usr/share/keyrings/
+RUN \
+    # Install node, postgres, and yarn packages to install version 18 of nodejs and 15 of postgres.
+    curl -ssL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor  > ${KEYRINGS}nodesource.gpg && \
+    curl -sSl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > ${KEYRINGS}postgres.gpg && \
+    curl -sSl https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor > ${KEYRINGS}yarn.gpg && \
+    echo "deb [signed-by=${KEYRINGS}nodesource.gpg] https://deb.nodesource.com/node_18.x ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/nodesource.list && \
+    echo "deb [signed-by=${KEYRINGS}postgres.gpg] http://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    echo "deb [signed-by=${KEYRINGS}yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list && \
+    apt-get update && \
+    apt-get install -y jpegoptim optipng jhead nodejs yarn pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev cmake pkg-config libgit2-dev libsqlite3-dev postgresql-client-15 && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp/oxipng-install
@@ -44,7 +56,7 @@ RUN git config --global http.sslVerify false && \
 WORKDIR /var/www/discourse
 
 
-RUN corepack enable
+# RUN corepack enable
 RUN yarn install --production --frozen-lockfile && yarn cache clean
 ENV RAILS_ENV production
 RUN bundle config --local without test development
