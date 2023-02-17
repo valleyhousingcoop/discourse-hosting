@@ -1,11 +1,71 @@
 # Discourse Hosting
 
-This repository contains the code for running Discourse locally .
+This repository provides a way to host Discourse on a server.
 
-This does not use the Docker images provided by discourse, instead opting to build a new one, so that each
-service can be broken up into its own docker container and we can build it with more traditional Docker tools
-instead of the wrapper provided by Discourse.
+## Goals
 
+When I set out to setup a forum for a local group I am a part of, I quickly settled on Discourse, since it was open
+source, had a nice UX, was actively updated, and had a large community. However, I couldn't find an existing
+hosting solution that met these goals:
+
+* Support existing tools (Docker Compose, etc)
+* Keep each image as close to single responsibility as possible
+* Free (or as close to as possible) hosting
+* Easy to setup and upgrade, i.e. little implicit state
+* Ability to support any Discourse plugin
+* Email sending and recieving
+
+
+The online supported hosting would easily be $100+ per month for a forum with some plugins, which was a no-go for our organization to start.
+
+Alternatively, [the supported way of hosting Discourse](https://github.com/discourse/discourse/blob/main/docs/INSTALL-cloud.md) uses a custom installer script. There is [a long standing issue about having a more standard way of deploying Discourse](https://meta.discourse.org/t/can-discourse-ship-frequent-docker-images-that-do-not-need-to-be-bootstrapped/33205).
+
+
+## Solution
+
+So I decided to:
+
+1. Build my own Docker image for Discourse so I had more control over what was shipped in it and the bootstrapping process
+2. Host it on a laptop sitting at my friends host. At first I had it running on [Render](https://render.com/) as well as [Digital Ocean App Platform](https://www.digitalocean.com/products/app-platform), but the pricing for setting up a couple services as well as the DB and redis quickly added up. I also found it much harder to debug when things went wrong (oh and things did go wrong...).
+3. Use Docker Compose to manage the deployment, along with [Tilt](https://tilt.dev/) to help with the development process. I had considered using Swarm, but it doesn't seem too maintained, and also I only needed to host it on one machine. I had also considered Kubernetes, but it seemed like overkill (both in terms of complixity and resource usage) for my use case at the time.
+
+
+
+## How to get started
+
+### Pre-requisites
+Before you get started with your forum, you will need a few things:
+
+1. A domain to host this at! This can be a top level domain or a subdomain. You can get this for free most likely if you would like.
+2. A [SendGrid](https://sendgrid.com/) account! Sending and recieveing emails is one of the things that I coudn't do locally. Most residentials ISPs block port 25, and I have heard there is a lot of voodoo magic for getting all the right settings and earning trust around spam blockers. All of our email fits under Sengrid's free tier, so that's nice `:)`
+3. A computer with at least 4 GB of ram which can run Docker. I am running this on a 2017 13 inch Macbook air. I also assume that you will be developing this on a different computer, which can SSH into that computer.
+4. An internet provider which will allow you to open up ports 22 (SSH), 80 (HTTP), and 443 (HTTPS), as well as port 8080 for email forwarding.
+5. A free Cloudflare account, which we will use for DNS. I have another domain provider, but switched my nameservers to use them. You could also use another DNS provider, you just might have to change a few things.
+
+### Setup
+
+local Computer
+
+Remote computer
+
+Sendgrid
+- domain DNS
+- Callback for emails
+
+
+Software setup
+
+locally: set env variables
+tilt up
+
+use docker context
+
+
+
+
+
+
+## Things I learned about Discourse
 
 
 ## Local Development with Docker Compose
@@ -100,15 +160,10 @@ helper.preload_script("vendor")
 ActionController::Base.helpers.asset_path("vendor.js")
 ```
 
-## Ruby Debugger
+### Ruby Debugger
 
 We also include the `debug` gem, which you can invoke to start a bundle command with debugging:
 
 ```bash
 docker compose run --rm upload_assets rdbg -c --  bundle exec rake s3:upload_assets
 ```
-
-## About
-
-We run the sidekiq alongside the web process in the same container. This is so that they can share a mounted volume [in Render](https://render.com/docs/disks) which cannot be shared accross containers. Alternatively,
-we could set everything up to use a third party service like S3 for uploads and assets.
