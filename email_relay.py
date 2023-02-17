@@ -21,15 +21,14 @@ sentry_sdk.init(
 
 app = Flask(__name__)
 
-smtp = smtplib.SMTP("mail-reciever")
-# atexit.register(smtp.close)
-
 
 @app.route("/", methods=["GET", "POST"])
 def hello_world():
+    smtp = smtplib.SMTP("mail-reciever")
     payload = request.form
     # https://docs.sendgrid.com/for-developers/parsing-email/setting-up-the-inbound-parse-webhook#raw-parameters
     smtp.sendmail(payload["from"], payload["to"], payload["email"])
+    smtp.close()
     return "OK"
 
 
