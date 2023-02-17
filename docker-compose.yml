@@ -137,7 +137,7 @@ services:
     image: discourse/mail-receiver:release
     restart: always
     ports:
-      - "25:25"
+      - "25"
     volumes:
       - postfix:/var/spool/postfix
     environment:
@@ -146,6 +146,18 @@ services:
       - DISCOURSE_BASE_URL=https://${HOSTNAME}
       - DISCOURSE_API_USERNAME=system
     depends_on:
+      - nginx
+  email-relay:
+    restart: always
+    build:
+      context: .
+      dockerfile: email-relay.Dockerfile
+    environment:
+      - SENTRY_DSN=${DSN}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mail-reciever
       - nginx
   test-email:
     build:
