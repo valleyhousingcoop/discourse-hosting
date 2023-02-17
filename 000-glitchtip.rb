@@ -5,6 +5,9 @@ Sentry.init do |config|
   # Disable session tracking since not supported by glitchtip
   # https://gitlab.com/glitchtip/glitchtip-backend/-/issues/206
   config.auto_session_tracking = false
+
+  # Track all transactions by default
+  config.traces_sample_rate = 1.0
 end
 
 
