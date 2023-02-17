@@ -22,7 +22,7 @@ sentry_sdk.init(
 app = Flask(__name__)
 
 smtp = smtplib.SMTP("mail-reciever")
-atexit.register(smtp.close)
+# atexit.register(smtp.close)
 
 
 @app.route("/", methods=["GET", "POST"])
