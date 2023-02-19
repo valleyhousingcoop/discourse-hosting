@@ -23,11 +23,10 @@ x-discourse:
     args:
       - DISCOURSE_HOSTNAME=${HOSTNAME}
       - DISCOURSE_S3_CDN_URL=https://assets.${HOSTNAME}
+      - SENTRY_DSN=${DSN}
   env_file:
     - .env
     - discourse.env
-  environment:
-    - SENTRY_DSN=${DSN}
   depends_on:
     - db
     - redis
