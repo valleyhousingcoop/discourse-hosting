@@ -57,7 +57,10 @@ WORKDIR /var/www/discourse
 
 
 # RUN corepack enable
-RUN yarn install --production --frozen-lockfile && yarn cache clean
+RUN yarn install --production --frozen-lockfile && \
+    cd app/assets/javascripts/discourse && \
+    node_modules/.bin/ember install @sentry/ember && \
+    yarn cache clean
 ENV RAILS_ENV production
 RUN bundle config --local without test development
 RUN bundle add sentry-ruby --skip-install --version '>=5.8.0' && \
@@ -72,11 +75,17 @@ RUN env LOAD_PLUGINS=0 bundle exec rake plugin:pull_compatible_all
 
 ARG DISCOURSE_HOSTNAME
 ARG DISCOURSE_S3_CDN_URL
+ARG SENTRY_DSN
 ENV DISCOURSE_HOSTNAME=$DISCOURSE_HOSTNAME
 ENV DISCOURSE_S3_CDN_URL=$DISCOURSE_S3_CDN_URL
+ENV SENTRY_DSN=$SENTRY_DSN
 
 # Mock DB and redis during assets precompilation
 COPY 003-mock-redis.rb ./config/initializers/
+# Add sentry to assets precompilation
+# https://docs.sentry.io/platforms/javascript/guides/ember/
+RUN { echo 'import * as Sentry from "@sentry/ember"; Sentry.init({dsn: ' \"${SENTRY_DSN}\" ', tracesSampleRate: 0.1})'; cat app/assets/javascripts/discourse/app/app.js; } > tmp.js && \
+    mv -f tmp.js app/assets/javascripts/discourse/app/app.js
 RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile && \
     rm ./config/initializers/003-mock-redis.rb
 

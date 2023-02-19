@@ -6,8 +6,7 @@ Sentry.init do |config|
   # https://gitlab.com/glitchtip/glitchtip-backend/-/issues/206
   config.auto_session_tracking = false
 
-  # Track all transactions by default
-  config.traces_sample_rate = 1.0
+  config.traces_sample_rate = 0.1
 end
 
 
