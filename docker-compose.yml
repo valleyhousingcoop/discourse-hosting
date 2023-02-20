@@ -80,7 +80,7 @@ services:
   install_themes:
     <<: *discourse
     command: |
-      bundle exec rake --trace themes:install -- '--{"discourse-kanban-theme": "https://github.com/discourse/discourse-kanban-theme"}'
+      bundle exec rake --trace themes:install -- '--{"discourse-wikified-posts": "https://github.com/nathan-nz/discourse-wikified-posts"}'
 
   nginx:
     restart: always
