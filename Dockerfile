@@ -84,7 +84,7 @@ ENV SENTRY_DSN=$SENTRY_DSN
 COPY 003-mock-redis.rb ./config/initializers/
 # Add sentry to assets precompilation
 # https://docs.sentry.io/platforms/javascript/guides/ember/
-RUN { echo 'import * as Sentry from "@sentry/ember"; Sentry.init({dsn: ' \"${SENTRY_DSN}\" ', tracesSampleRate: 0.1})'; cat app/assets/javascripts/discourse/app/app.js; } > tmp.js && \
+RUN { echo 'import * as Sentry from "@sentry/ember"; Sentry.init({dsn: ' \"${SENTRY_DSN}\" ', tracesSampleRate: 0.1, autoSessionTracking: false})'; cat app/assets/javascripts/discourse/app/app.js; } > tmp.js && \
     mv -f tmp.js app/assets/javascripts/discourse/app/app.js
 RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile && \
     rm ./config/initializers/003-mock-redis.rb
@@ -96,8 +96,9 @@ RUN { echo 'stdout_path nil'; echo 'stderr_path nil'; echo 'logger Logger.new(ST
 COPY 999-log-stdout.rb 000-glitchtip.rb ./config/initializers/
 COPY discourse.run.sh ./
 
-# Copy error handling to sikekiq so its loaded then
-# RUN cat /var/www/discourse/config/initializers/999-log-stdout.rb >> /var/www/discourse/config/initializers/100-sidekiq.rb
+# Only the sidekiq initializer is loaded for jobs, so move error handling to that.
+RUN cat /var/www/discourse/config/initializers/000-glitchtip.rb >> /var/www/discourse/config/initializers/100-sidekiq.rb && \
+    rm /var/www/discourse/config/initializers/000-glitchtip.rb
 
 # Replace `klass.class_eval patches` with `return` in lib/method_profiler.rb to support sentry
 # https://github.com/getsentry/sentry-ruby/issues/1999
