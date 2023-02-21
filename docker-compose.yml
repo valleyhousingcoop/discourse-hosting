@@ -144,6 +144,7 @@ services:
       - DISCOURSE_API_KEY=${DISCOURSE_API_KEY}
       - DISCOURSE_BASE_URL=https://${HOSTNAME}
       - DISCOURSE_API_USERNAME=system
+      - POSTCONF_message_size_limit=102400000
     depends_on:
       - nginx
   email-relay:
