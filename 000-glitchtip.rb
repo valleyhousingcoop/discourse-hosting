@@ -6,6 +6,9 @@ Sentry.init do |config|
   # https://gitlab.com/glitchtip/glitchtip-backend/-/issues/206
   config.auto_session_tracking = false
 
+  # Disable client reports since not supported by glitchtip
+  config.send_client_reports = false
+
   config.traces_sample_rate = 0.1
   # Upload whole traceback on error
   config.debug = true
