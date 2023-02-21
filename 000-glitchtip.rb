@@ -7,6 +7,8 @@ Sentry.init do |config|
   config.auto_session_tracking = false
 
   config.traces_sample_rate = 0.1
+  # Upload whole traceback on error
+  config.debug = true
 end
 
 
