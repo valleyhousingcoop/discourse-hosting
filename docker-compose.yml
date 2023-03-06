@@ -32,7 +32,7 @@ x-discourse:
     - redis
     - minio
     - glitchtip-web
-
+  image: discourse/23.03.05
 services:
   glitchtip-web:
     <<: *glitchtip

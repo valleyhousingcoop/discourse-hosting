@@ -1,3 +1,4 @@
+paviliondev/discourse-subscription-client
 paviliondev/discourse-events
 paviliondev/discourse-custom-wizard
 # discourse/discourse-adplugin

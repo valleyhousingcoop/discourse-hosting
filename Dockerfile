@@ -86,9 +86,14 @@ COPY 003-mock-redis.rb ./config/initializers/
 # https://docs.sentry.io/platforms/javascript/guides/ember/
 RUN { echo 'import * as Sentry from "@sentry/ember"; Sentry.init({dsn: ' \"${SENTRY_DSN}\" ', tracesSampleRate: 0.1, autoSessionTracking: false})'; cat app/assets/javascripts/discourse/app/app.js; } > tmp.js && \
     mv -f tmp.js app/assets/javascripts/discourse/app/app.js
-RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile && \
-    rm ./config/initializers/003-mock-redis.rb
+# Turn off discourse subscriptio clientinitialization for assets precompilation, since DB and redis aren't release
+# Switch blank line to next in /var/www/discourse/plugins/discourse-subscription-client/plugin.rb:45
+RUN sed -i '45s/.*/  next/' /var/www/discourse/plugins/discourse-subscription-client/plugin.rb
 
+RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile
+RUN rm ./config/initializers/003-mock-redis.rb
+# Switch back line to blank in /var/www/discourse/plugins/discourse-subscription-client/plugin.rb:45
+RUN sed -i '45s/.*//' /var/www/discourse/plugins/discourse-subscription-client/plugin.rb
 
 EXPOSE 3000
 # Print logs to stdout/stderr instead of to a file.
