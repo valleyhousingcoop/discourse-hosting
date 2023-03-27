@@ -1,10 +1,11 @@
 # syntax=docker/dockerfile:1
 # https://github.com/discourse/discourse/blob/main/docs/DEVELOPER-ADVANCED.md
 # https://hub.docker.com/_/ruby
+# Based off of https://github.com/discourse/discourse_docker/commit/3d3b7c8584518204036b9e24980f220c8514d1da
 
 # Use Ruby < 3.1 to avoid missing net/pop error
 # https://github.com/discourse/discourse/pull/15692/files
-FROM ruby:3.1
+FROM ruby:3.2.1
 LABEL org.opencontainers.image.source="https://github.com/saulshanabrook/discourse-hosting"
 
 ENV LANG C.UTF-8
@@ -26,13 +27,14 @@ RUN \
     echo "deb [signed-by=${KEYRINGS}postgres.gpg] http://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     echo "deb [signed-by=${KEYRINGS}yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list && \
     apt-get update && \
-    apt-get install -y jpegoptim optipng jhead nodejs yarn pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev cmake pkg-config libgit2-dev libsqlite3-dev postgresql-client-15 && \
+    apt-get install -y jpegoptim optipng jhead nodejs yarn pngquant brotli gnupg locales locales-all pngcrush imagemagick libmagickwand-dev cmake pkg-config libgit2-dev libsqlite3-dev postgresql-client-15 librsvg2-dev libffi-dev && \
     rm -rf /var/lib/apt/lists/*
 
+ENV OXIPNG_VERSION=8.0.0
 WORKDIR /tmp/oxipng-install
-RUN wget https://github.com/shssoichiro/oxipng/releases/download/v5.0.1/oxipng-5.0.1-x86_64-unknown-linux-musl.tar.gz \
- && tar -xzf oxipng-5.0.1-x86_64-unknown-linux-musl.tar.gz \
- && cp oxipng-5.0.1-x86_64-unknown-linux-musl/oxipng /usr/local/bin \
+RUN wget https://github.com/shssoichiro/oxipng/releases/download/v${OXIPNG_VERSION}/oxipng-${OXIPNG_VERSION}-x86_64-unknown-linux-musl.tar.gz \
+ && tar -xzf oxipng-${OXIPNG_VERSION}-x86_64-unknown-linux-musl.tar.gz \
+ && cp oxipng-${OXIPNG_VERSION}-x86_64-unknown-linux-musl/oxipng /usr/local/bin \
  && rm -rf /tmp/oxipng-install
 
 RUN npm install -g svgo terser uglify-js
@@ -47,11 +49,12 @@ RUN mkdir -p tmp/sockets log tmp/pids
 
 # Only fetch one commit to reduce size
 # https://stackoverflow.com/a/43136160/907060
+# Actually just fetch one tag
 RUN git config --global http.sslVerify false && \
-    git clone https://github.com/discourse/discourse.git --depth 1 --branch tests-passed /var/www/discourse && \
-    cd /var/www/discourse && \
-    git fetch --depth 1 origin e6a41150e24f3163d61d32f86834acae8098dead && \
-    git checkout FETCH_HEAD
+    git clone https://github.com/discourse/discourse.git --depth 1 --branch v3.1.0.beta3 /var/www/discourse && \
+    cd /var/www/discourse
+    # git fetch --depth 1 origin v3.1.0.beta3 && \
+    # git checkout FETCH_HEAD
 
 WORKDIR /var/www/discourse
 
@@ -86,14 +89,16 @@ COPY 003-mock-redis.rb ./config/initializers/
 # https://docs.sentry.io/platforms/javascript/guides/ember/
 RUN { echo 'import * as Sentry from "@sentry/ember"; Sentry.init({dsn: ' \"${SENTRY_DSN}\" ', tracesSampleRate: 0.1, autoSessionTracking: false})'; cat app/assets/javascripts/discourse/app/app.js; } > tmp.js && \
     mv -f tmp.js app/assets/javascripts/discourse/app/app.js
-# Turn off discourse subscriptio clientinitialization for assets precompilation, since DB and redis aren't release
-# Switch blank line to next in /var/www/discourse/plugins/discourse-subscription-client/plugin.rb:45
-RUN sed -i '45s/.*/  next/' /var/www/discourse/plugins/discourse-subscription-client/plugin.rb
+
+# Turn off discourse subscription client initialization for assets precompilation, since DB and redis aren't release
+# Switch blank line to next in /var/www/discourse/plugins/discourse-subscription-client/plugin.rb:46
+RUN sed -i '46s/.*/  next/' /var/www/discourse/plugins/discourse-subscription-client/plugin.rb
 
 RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile
 RUN rm ./config/initializers/003-mock-redis.rb
-# Switch back line to blank in /var/www/discourse/plugins/discourse-subscription-client/plugin.rb:45
-RUN sed -i '45s/.*//' /var/www/discourse/plugins/discourse-subscription-client/plugin.rb
+# Switch back line to blank in /var/www/discourse/plugins/discourse-subscription-client/plugin.rb:46
+
+RUN sed -i '46s/.*//' /var/www/discourse/plugins/discourse-subscription-client/plugin.rb
 
 EXPOSE 3000
 # Print logs to stdout/stderr instead of to a file.

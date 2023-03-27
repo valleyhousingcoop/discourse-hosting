@@ -1,3 +1,6 @@
+merefield/discourse-chatbot
+merefield/discourse-ai-topic-summary
+paviliondev/discourse-locations
 paviliondev/discourse-subscription-client
 paviliondev/discourse-events
 paviliondev/discourse-custom-wizard

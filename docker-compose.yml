@@ -32,7 +32,7 @@ x-discourse:
     - redis
     - minio
     - glitchtip-web
-  image: discourse/23.03.05
+  image: discourse/v3.1.0.beta3
 services:
   glitchtip-web:
     <<: *glitchtip
@@ -71,6 +71,9 @@ services:
   web:
     <<: *discourse
     restart: always
+    # Set max memory to 2gb so its restarted every when it exceeds that
+    # This is to prevent memory leaks
+    mem_limit: 2g
   migrate:
     <<: *discourse
     command: bundle exec rake --trace db:migrate
