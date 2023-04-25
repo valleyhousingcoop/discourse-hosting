@@ -3,9 +3,7 @@
 # https://hub.docker.com/_/ruby
 # Based off of https://github.com/discourse/discourse_docker/commit/3d3b7c8584518204036b9e24980f220c8514d1da
 
-# Use Ruby < 3.1 to avoid missing net/pop error
-# https://github.com/discourse/discourse/pull/15692/files
-FROM ruby:3.2.1
+FROM ruby:3.2.2
 LABEL org.opencontainers.image.source="https://github.com/saulshanabrook/discourse-hosting"
 
 ENV LANG C.UTF-8
@@ -51,17 +49,18 @@ RUN mkdir -p tmp/sockets log tmp/pids
 # https://stackoverflow.com/a/43136160/907060
 # Actually just fetch one tag
 RUN git config --global http.sslVerify false && \
-    git clone https://github.com/discourse/discourse.git --depth 1 --branch v3.1.0.beta3 /var/www/discourse && \
-    cd /var/www/discourse
-    # git fetch --depth 1 origin v3.1.0.beta3 && \
-    # git checkout FETCH_HEAD
+    git clone https://github.com/discourse/discourse.git --depth 1 --branch tests-passed /var/www/discourse && \
+    cd /var/www/discourse && \
+    git fetch --depth 1 origin 7c9b8c42c1ffe88c92a175620eddcff8af6d1fc8 && \
+    git checkout FETCH_HEAD
 
 WORKDIR /var/www/discourse
 
 
 # RUN corepack enable
-RUN yarn install --production --frozen-lockfile && \
+RUN yarn install --frozen-lockfile && \
     cd app/assets/javascripts/discourse && \
+    yarn add broccoli-plugin && \
     node_modules/.bin/ember install @sentry/ember && \
     yarn cache clean
 ENV RAILS_ENV production

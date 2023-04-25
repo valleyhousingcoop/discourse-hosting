@@ -1,3 +1,6 @@
+discourse/discourse-ai
+discourse/discourse-custom-header-links
+discourse/discourse-category-icons
 merefield/discourse-chatbot
 merefield/discourse-ai-topic-summary
 paviliondev/discourse-locations
