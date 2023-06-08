@@ -1,5 +1,11 @@
+require "resolv-replace"
+
 Sentry.init do |config|
-  config.breadcrumbs_logger = [:sentry_logger, :active_support_logger, :http_logger]
+  config.breadcrumbs_logger = %i[
+    sentry_logger
+    active_support_logger
+    http_logger
+  ]
   config.include_local_variables = true
   config.send_default_pii = true
   # Disable session tracking since not supported by glitchtip
@@ -14,14 +20,12 @@ Sentry.init do |config|
   config.debug = true
 end
 
-
 # Patch Discourse's warn_exception to send exceptions to Sentry as well
 # Patch code from https://blog.appsignal.com/2021/08/24/responsible-monkeypatching-in-ruby.html
 
 module DiscourseWarnExceptionMonkeypatch
   class << self
     def apply_patch
-
       const = find_const
       mtd = find_method(const)
 
@@ -29,10 +33,9 @@ module DiscourseWarnExceptionMonkeypatch
       # make sure the #build_hidden method exists and accepts exactly
       # two arguments
       unless const && mtd
-        raise "Could not find class or method when patching "\
-          "Discourse's warn_exception helper. Please investigate."
+        raise "Could not find class or method when patching " \
+                "Discourse's warn_exception helper. Please investigate."
       end
-
 
       # actually apply the patch
       const.prepend(InstanceMethods)
@@ -41,7 +44,7 @@ module DiscourseWarnExceptionMonkeypatch
     private
 
     def find_const
-      Kernel.const_get('Discourse')
+      Kernel.const_get("Discourse")
     rescue NameError
       # return nil if the constant doesn't exist
     end
@@ -52,11 +55,9 @@ module DiscourseWarnExceptionMonkeypatch
     rescue NameError
       # return nil if the method doesn't exist
     end
-
   end
 
   module InstanceMethods
-
     # https://blog.daveallie.com/clean-monkey-patching#prepending-a-module
     def self.prepended(base)
       base.singleton_class.prepend(ClassMethods)
@@ -68,7 +69,6 @@ module DiscourseWarnExceptionMonkeypatch
         super
       end
     end
-
   end
 end
 
