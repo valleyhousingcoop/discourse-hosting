@@ -62,7 +62,7 @@ discourse/discourse-perspective-api
 # ArgumentError: wrong number of arguments (given 3, expected 1)
 # discourse/discourse-policy
 # discourse/discourse-presence
-discourse/discourse-prometheus
+# discourse/discourse-prometheus
 # discourse/discourse-prometheus-alert-receiver
 discourse/discourse-push-notifications
 discourse/discourse-reactions
