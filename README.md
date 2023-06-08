@@ -44,6 +44,14 @@ Before you get started with your forum, you will need a few things:
 
 ### Setup
 
+
+# Remove Computer
+
+
+```bash
+butane butane_config.yaml > ignition_config.json
+```
+
 local Computer
 
 Remote computer

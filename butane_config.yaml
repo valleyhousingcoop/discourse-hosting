@@ -1,0 +1,98 @@
+variant: flatcar
+version: 1.0.0
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCz/VPct0SCyjW7KgQ0SRG0B01C8N3SgEGPtCRgDFI4D0v/mudfa15hdFxPBJeHylZDMy9oUkSKu7gLXdT7bECQHcFua38Y4fEnRnp7vS73rCSEhbdHJMiaJWh6imlsu71hPZ/ALhaek1ts8pRmzdfiWM1aoXI2EoYS9yrn9m0N1B630+ZOb0zlxRs2JxPUsWtngkwKEU1Ywkg9lw+waRcAgDgvtQkRd6coQ4rR6kd2TJ1wybTdexXuiWtdNalPVq7NbmVT2O4F/IJlN/GRSipgOF1owVEsiNVSmPkOzVJYYEPt/s1URKg/oBgJ8lK9OURFWo57T3jIBvk1il/hFLGh s.shanabrook@gmail.com
+systemd:
+  units:
+    # Ensure docker starts automatically instead of being only socket-activated
+    - name: docker.service
+      enabled: true
+      dropins:
+        - name: 30-increase-ulimit.conf
+          contents: |
+            [Service]
+            LimitMEMLOCK=infinity
+    # https://www.flatcar.org/docs/latest/setup/customization/power-management/
+    - name: cpu-governor.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Enable CPU power saving
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/sbin/modprobe cpufreq_ondemand
+        ExecStart=/usr/bin/sh -c '/usr/bin/echo "ondemand" | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor'
+
+        [Install]
+        WantedBy=multi-user.target
+storage:
+  files:
+    - path: /etc/docker/daemon.json
+      mode: 0644
+      contents:
+        inline: |
+          {
+            "log-driver": "local",
+            "features": {"buildkit": true}
+          }
+    - path: /etc/ssh/sshd_config
+      overwrite: true
+      mode: 0600
+      contents:
+        inline: |
+          ##
+          # https://www.flatcar.org/docs/latest/setup/security/customizing-sshd/#customizing-sshd-with-a-butane-config
+          ##
+
+          # Use most defaults for sshd configuration.
+          UsePrivilegeSeparation sandbox
+          Subsystem sftp internal-sftp
+          UseDNS no
+
+          PermitRootLogin no
+          AllowUsers core
+          AuthenticationMethods publickey
+
+          ##
+          # https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67
+          ##
+
+          # Supported HostKey algorithms by order of preference.
+          HostKey /etc/ssh/ssh_host_ed25519_key
+          HostKey /etc/ssh/ssh_host_rsa_key
+          HostKey /etc/ssh/ssh_host_ecdsa_key
+
+          KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
+
+          Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+
+          MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+
+          # Password based logins are disabled - only public key based logins are allowed.
+          AuthenticationMethods publickey
+
+          # LogLevel VERBOSE logs user's key fingerprint on login. Needed to have a clear audit track of which key was using to log in.
+          LogLevel VERBOSE
+
+          # Log sftp level file access (read/write/etc.) that would not be easily logged otherwise.
+          Subsystem sftp  /usr/lib/ssh/sftp-server -f AUTHPRIV -l INFO
+
+          # Root login is not allowed for auditing reasons. This is because it's difficult to track which process belongs to which root user:
+          #
+          # On Linux, user sessions are tracking using a kernel-side session id, however, this session id is not recorded by OpenSSH.
+          # Additionally, only tools such as systemd and auditd record the process session id.
+          # On other OSes, the user session id is not necessarily recorded at all kernel-side.
+          # Using regular users in combination with /bin/su or /usr/bin/sudo ensure a clear audit track.
+          PermitRootLogin No
+
+          ##
+          # https://docs.docker.com/engine/security/protect-access/#ssh-tips
+          ##
+          ControlMaster     auto
+          ControlPath       ~/.ssh/control-%C
+          ControlPersist    yes
