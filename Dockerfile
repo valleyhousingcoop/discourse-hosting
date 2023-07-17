@@ -1,16 +1,16 @@
 # syntax=docker/dockerfile:1
 # https://github.com/discourse/discourse/blob/main/docs/DEVELOPER-ADVANCED.md
 # https://hub.docker.com/_/ruby
-# Based off of https://github.com/discourse/discourse_docker/commit/3d3b7c8584518204036b9e24980f220c8514d1da
+# Check for updates: https://github.com/discourse/discourse_docker/compare/58eada78642c504164ff4952a25ddd2b8c69f9c1...main
 
 FROM ruby:3.2.2
 LABEL org.opencontainers.image.source="https://github.com/saulshanabrook/discourse-hosting"
-
+ARG DISCOURSE_TAG
 ENV LANG C.UTF-8
 
 
 # Hard code version codename to remove need for lsb_release
-ENV VERSION_CODENAME=bullseye
+ENV VERSION_CODENAME=bookworm
 # Verify version codename
 RUN cat /etc/os-release | grep VERSION_CODENAME=$VERSION_CODENAME
 
@@ -51,7 +51,7 @@ RUN mkdir -p tmp/sockets log tmp/pids
 RUN git config --global http.sslVerify false && \
     git clone https://github.com/discourse/discourse.git --depth 1 --branch tests-passed /var/www/discourse && \
     cd /var/www/discourse && \
-    git fetch --depth 1 origin 7c9b8c42c1ffe88c92a175620eddcff8af6d1fc8 && \
+    git fetch --depth 1 origin $DISCOURSE_TAG && \
     git checkout FETCH_HEAD
 
 WORKDIR /var/www/discourse
@@ -89,15 +89,21 @@ COPY 003-mock-redis.rb ./config/initializers/
 RUN { echo 'import * as Sentry from "@sentry/ember"; Sentry.init({dsn: ' \"${SENTRY_DSN}\" ', tracesSampleRate: 0.1, autoSessionTracking: false})'; cat app/assets/javascripts/discourse/app/app.js; } > tmp.js && \
     mv -f tmp.js app/assets/javascripts/discourse/app/app.js
 
-# Turn off discourse subscription client initialization for assets precompilation, since DB and redis aren't release
-# Switch blank line to next in /var/www/discourse/plugins/discourse-subscription-client/plugin.rb:46
-RUN sed -i '46s/.*/  next/' /var/www/discourse/plugins/discourse-subscription-client/plugin.rb
+# Turn off discourse subscription client initialization for assets precompilation, since DB and redis aren't ready
+# Add `  next` after `after_initialize do` line so that it ends early in
+#  /var/www/discourse/plugins/discourse-subscription-client/plugin.rb
+RUN cp /var/www/discourse/plugins/discourse-subscription-client/plugin.rb /var/www/discourse/plugins/discourse-subscription-client/plugin.rb.bak
+RUN sed -i 's/after_initialize do/after_initialize do\n  next/' /var/www/discourse/plugins/discourse-subscription-client/plugin.rb
+
+# Similarily add `  next` before the line containing DB.query_single in discourse-ai plugin
+RUN cp /var/www/discourse/plugins/discourse-ai/plugin.rb /var/www/discourse/plugins/discourse-ai/plugin.rb.bak
+RUN sed -i 's/  if DB.query_single/  next\n  if DB.query_single/' /var/www/discourse/plugins/discourse-ai/plugin.rb
 
 RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile
 RUN rm ./config/initializers/003-mock-redis.rb
-# Switch back line to blank in /var/www/discourse/plugins/discourse-subscription-client/plugin.rb:46
-
-RUN sed -i '46s/.*//' /var/www/discourse/plugins/discourse-subscription-client/plugin.rb
+# Revert backup
+RUN mv -f /var/www/discourse/plugins/discourse-subscription-client/plugin.rb.bak /var/www/discourse/plugins/discourse-subscription-client/plugin.rb
+RUN mv -f /var/www/discourse/plugins/discourse-ai/plugin.rb.bak /var/www/discourse/plugins/discourse-ai/plugin.rb
 
 EXPOSE 3000
 # Print logs to stdout/stderr instead of to a file.

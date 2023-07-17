@@ -42,15 +42,49 @@ Before you get started with your forum, you will need a few things:
 4. An internet provider which will allow you to open up ports 22 (SSH), 80 (HTTP), and 443 (HTTPS), as well as port 8080 for email forwarding.
 5. A free Cloudflare account, which we will use for DNS. I have another domain provider, but switched my nameservers to use them. You could also use another DNS provider, you just might have to change a few things.
 
-### Setup
+### Remote Server
 
+1. Use `configs/daemon.json` for your docker daemon config. This changes logging to be more performant.
+2. Use `configs/sshd_config` as a secure SSH config
+3. Setup docker to connect with the server over ssh
+
+
+### First Launch
+
+Start up services:
+
+```shell
+docker compose up -d db redis minio
+docker compose run --rm --no-deps glitchtip-migrate
+docker compose run --rm --no-deps migrate
+docker compose run --rm --no-deps upload_assets
+docker compose up -d --no-deps glitchtip-web glitchtip-worker web mail-reciever ddclient email-relay
+docker compose up -d --no-deps nginx
+```
+
+Open glitchtip, sign up for an account, copy DSN to `.env`.
+
+Rebuild web with DSN and re-copy assets:
+
+```shell
+docker compose run --rm --no-deps --build upload_assets
+docker compose up -d --no-deps web
+```
+
+
+### Restroring from a local backup file
+
+```shell
+docker compose run --rm --no-deps web ./script/discourse enable_restore
+# Must preserve file name
+docker cp /path/to/<name>.sql.gz discourse-hosting-web-1:/var/www/discourse/public/backups/default/
+docker exec -it discourse-hosting-web-1 env DISCOURSE_BACKUP_LOCATION=local ./script/discourse restore ./<name>.sql.gz
+docker compose run --rm --no-deps web ./script/discourse disable_restore
+docker compose run --rm --no-deps web bundle exec rake posts:rebake
+```
 
 # Remove Computer
 
-
-```bash
-butane butane_config.yaml > ignition_config.json
-```
 
 local Computer
 
