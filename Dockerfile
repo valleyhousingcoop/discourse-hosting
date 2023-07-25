@@ -99,7 +99,16 @@ RUN sed -i 's/after_initialize do/after_initialize do\n  next/' /var/www/discour
 RUN cp /var/www/discourse/plugins/discourse-ai/plugin.rb /var/www/discourse/plugins/discourse-ai/plugin.rb.bak
 RUN sed -i 's/  if DB.query_single/  next\n  if DB.query_single/' /var/www/discourse/plugins/discourse-ai/plugin.rb
 
-RUN env SKIP_DB_AND_REDIS=1 bundle exec rake assets:precompile
+# Need this for proper service worker compilation so it adds the right URL
+# https://github.com/discourse/discourse/pull/22019/files#diff-5aa550c12017fd0bbcf7b37c23c1242e67f73afd84a618ff28dbebab6c2d32dbR4
+# Need to have the `use_s3` preference be true, so set thes S3 env vars
+
+RUN env SKIP_DB_AND_REDIS=1 \
+        DISCOURSE_S3_BUCKET=1 \
+        DISCOURSE_S3_REGION=1 \
+        DISCOURSE_S3_USE_IAM_PROFILE=1 \
+        bundle exec rake assets:precompile
+
 RUN rm ./config/initializers/003-mock-redis.rb
 # Revert backup
 RUN mv -f /var/www/discourse/plugins/discourse-subscription-client/plugin.rb.bak /var/www/discourse/plugins/discourse-subscription-client/plugin.rb
