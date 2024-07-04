@@ -2,6 +2,8 @@
 
 This repository provides a way to host Discourse on a server.
 
+**UPDATE**: I found it too hard to maintain this setup especially accross discourse updates. I have since switched to the [standard discourse hosting setup](https://github.com/discourse/discourse/blob/main/docs/INSTALL-cloud.md), locally on a machine in my basement. That is much more stable and I have had no issues upgrading things. I would highly reccomend someone trying to approach to have a second thought about it, unless you have a very high amount of time investment available. I spent months on getting this working. I think long term for this kind of setup to work, it would have to be upstreamed into discourse and offically supported so that it stays working.
+
 ## Goals
 
 When I set out to setup a forum for a local group I am a part of, I quickly settled on Discourse, since it was open
